@@ -1,3 +1,11 @@
+/* src/index.css -- JRS 2026-07-30
+   Design tokens and every view's styles.
+
+   One typeface, the system sans. Sizes come from a 1.25 scale and spacing from
+   a 4px grid; ad-hoc values are how this file ended up with eleven font sizes
+   before. Hierarchy is carried by size, weight and colour rather than by a
+   second family. */
+
 :root {
   --bg: #1c1917;
   --surface: #292524;
@@ -10,6 +18,25 @@
   --correct: #6ba368;
   --incorrect: #c4635a;
   --warn: #d9a94f;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-2xs: 0.64rem;
+  --text-xs: 0.8rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-body: 1.6;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
 
   --radius: 10px;
   --max-width: 40rem;
@@ -30,35 +57,36 @@ body {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  line-height: 1.5;
+  font-family: var(--font-sans);
+  line-height: var(--leading-body);
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 1.25rem 1rem calc(2rem + env(safe-area-inset-bottom));
+  padding: var(--space-5) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
 }
 
 h1,
 h2,
 h3 {
-  line-height: 1.25;
-  margin: 0 0 0.5rem;
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  margin: 0 0 var(--space-2);
 }
 
 h1 {
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   letter-spacing: -0.01em;
 }
 
 h2 {
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
 }
 
 p {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-3);
 }
 
 button {
@@ -68,7 +96,7 @@ button {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: var(--surface);
-  padding: 0.6rem 0.9rem;
+  padding: var(--space-2) var(--space-3);
   transition: background 0.12s ease, border-color 0.12s ease;
 }
 
@@ -89,10 +117,10 @@ button:focus-visible {
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #1c1917;
+  color: var(--bg);
   font-weight: 600;
   width: 100%;
-  padding: 0.8rem;
+  padding: var(--space-3);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -107,13 +135,14 @@ button:focus-visible {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .subtitle {
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
   margin: 0;
 }
 
@@ -121,40 +150,45 @@ button:focus-visible {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
-.label {
-  font-size: 0.75rem;
+.label,
+.stat-label,
+.box-label {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-dim);
-  margin-bottom: 0.5rem;
+}
+
+.label {
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-2);
 }
 
 /* Segmented control for subset selection */
 .segmented {
   display: flex;
-  gap: 0.375rem;
+  gap: var(--space-1);
 }
 
 .segmented button {
   flex: 1;
-  padding: 0.5rem 0.25rem;
-  font-size: 0.85rem;
+  padding: var(--space-2) var(--space-1);
+  font-size: var(--text-xs);
 }
 
 .segmented button[aria-pressed='true'] {
@@ -163,8 +197,8 @@ button:focus-visible {
 }
 
 .chip {
-  font-size: 0.8rem;
-  padding: 0.35rem 0.7rem;
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-3);
   border-radius: 999px;
 }
 
@@ -175,31 +209,83 @@ button:focus-visible {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
   text-align: center;
 }
 
 .stat-value {
-  font-size: 1.35rem;
+  font-size: var(--text-lg);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight);
 }
 
 .stat-label {
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: var(--text-2xs);
+}
+
+/* Leitner box distribution */
+.box-bar {
+  display: flex;
+  /* Segments are separated by surface, not by a border, so adjacent steps of
+     the ramp stay legible where they meet. */
+  gap: 2px;
+  height: 10px;
+  margin-top: var(--space-4);
+}
+
+.box-seg {
+  border-radius: 3px;
+  /* A single question in a box is still worth seeing. */
+  min-width: 3px;
+}
+
+.box-legend {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.box-legend li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.box-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.box-count {
+  font-size: var(--text-md);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight);
+}
+
+.box-label {
+  font-size: var(--text-2xs);
+}
+
+.box-caption {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-xs);
 }
 
 /* Quiz */
 .progress-bar {
-  height: 4px;
+  height: 3px;
   background: var(--surface);
   border-radius: 999px;
   overflow: hidden;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-5);
 }
 
 .progress-bar > div {
@@ -209,15 +295,18 @@ button:focus-visible {
 }
 
 .prompt {
-  font-size: 1.2rem;
+  font-size: var(--text-lg);
   font-weight: 500;
-  margin-bottom: 1.25rem;
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-5);
 }
 
 .choice {
+  font-size: var(--text-md);
+  line-height: var(--leading-snug);
   width: 100%;
   text-align: left;
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-3);
 }
 
 .choice.correct {
@@ -231,17 +320,18 @@ button:focus-visible {
 }
 
 .feedback {
-  margin-top: 1rem;
-  padding: 0.85rem;
+  margin-top: var(--space-4);
+  padding: var(--space-3);
   border-radius: var(--radius);
   background: var(--surface);
   border: 1px solid var(--border);
-  font-size: 0.9rem;
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
 }
 
 .feedback .verdict {
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
 }
 
 .verdict.right {
@@ -253,24 +343,25 @@ button:focus-visible {
 }
 
 .answer-reveal {
-  font-size: 1.05rem;
+  font-size: var(--text-md);
   font-weight: 500;
-  padding: 0.85rem;
+  line-height: var(--leading-snug);
+  padding: var(--space-3);
   border-radius: var(--radius);
   background: var(--surface-raised);
   border: 1px solid var(--border);
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
   white-space: pre-wrap;
 }
 
 .flag {
   display: inline-block;
-  font-size: 0.7rem;
+  font-size: var(--text-2xs);
   color: var(--warn);
   border: 1px solid var(--warn);
   border-radius: 999px;
-  padding: 0.1rem 0.5rem;
-  margin-bottom: 0.75rem;
+  padding: 0 var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 /* Sequence browser */
@@ -282,21 +373,22 @@ button:focus-visible {
 
 .pose-item {
   display: flex;
-  gap: 0.75rem;
-  padding: 0.6rem 0;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border);
 }
 
 .pose-item:last-child {
   border-bottom: none;
+  padding-bottom: 0;
 }
 
 .pose-num {
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
   min-width: 1.75rem;
-  padding-top: 0.15rem;
+  padding-top: 0.2rem;
 }
 
 .pose-sanskrit {
@@ -304,30 +396,32 @@ button:focus-visible {
 }
 
 .pose-meta {
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
   color: var(--text-dim);
 }
 
 .notice {
-  border-left: 3px solid var(--warn);
+  border-left: 2px solid var(--warn);
   background: var(--surface);
-  padding: 0.75rem 0.9rem;
+  padding: var(--space-3);
   border-radius: 0 var(--radius) var(--radius) 0;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  margin-bottom: var(--space-4);
 }
 
 .notice code {
+  font-size: 0.9em;
   background: var(--bg);
-  padding: 0.1rem 0.3rem;
+  padding: 0 var(--space-1);
   border-radius: 4px;
-  font-size: 0.85em;
 }
 
 .empty {
   text-align: center;
   color: var(--text-dim);
-  padding: 2rem 1rem;
+  padding: var(--space-6) var(--space-4);
 }
 
 /* Teleprompter */
@@ -339,31 +433,36 @@ button:focus-visible {
 
 .script-step {
   display: flex;
-  gap: 0.75rem;
-  padding: 0.55rem 0;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border);
 }
 
 .script-step:last-child {
   border-bottom: none;
+  padding-bottom: 0;
 }
 
+/* Wide enough for "catvari" and "trayodasa", no wider -- every rem here comes
+   straight out of the cue, which is the part being read aloud. */
 .script-count {
-  min-width: 5.5rem;
+  min-width: 4.5rem;
   flex-shrink: 0;
 }
 
 .script-numeral {
   display: block;
   font-weight: 600;
+  line-height: var(--leading-tight);
   color: var(--accent);
 }
 
 .script-breath {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--text-dim);
-  text-transform: lowercase;
 }
 
 .script-body {
@@ -371,25 +470,27 @@ button:focus-visible {
 }
 
 .script-cue {
-  line-height: 1.45;
+  line-height: var(--leading-body);
+}
+
+.script-gaze,
+.script-hold,
+.script-adaptation {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  margin-top: var(--space-1);
 }
 
 .script-gaze {
-  font-size: 0.85em;
   color: var(--warn);
-  margin-top: 0.15rem;
 }
 
 .script-hold {
-  font-size: 0.85em;
   color: var(--correct);
-  margin-top: 0.15rem;
 }
 
 .script-adaptation {
-  font-size: 0.85em;
   color: var(--text-dim);
-  margin-top: 0.15rem;
 }
 
 .script-gap {
@@ -398,15 +499,17 @@ button:focus-visible {
 }
 
 .script-issue {
-  font-size: 0.8em;
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
   color: var(--incorrect);
-  margin-top: 0.25rem;
+  margin-top: var(--space-2);
 }
 
-.script-large {
-  font-size: 1.2rem;
+/* Arm's-length setting for the teleprompter, toggled in the view. */
+.script-large .script-cue {
+  font-size: var(--text-lg);
 }
 
 .script-large .script-numeral {
-  font-size: 1.05rem;
+  font-size: var(--text-md);
 }

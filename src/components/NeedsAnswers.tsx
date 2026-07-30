@@ -55,7 +55,9 @@ export default function NeedsAnswers({ onExit }: Props) {
           <ul className="pose-list">
             {gazeGaps.map((poseId) => (
               <li className="pose-item" key={poseId}>
-                <span>{getPose(poseId)?.sanskrit ?? poseId}</span>
+                <span className="pose-sanskrit">
+                  {getPose(poseId)?.sanskrit ?? poseId}
+                </span>
               </li>
             ))}
           </ul>
