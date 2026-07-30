@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Utthita Trikonasana">
+  <!-- public/favicon.svg (JRS 2026-07-30): Utthita Trikonasana, proportions
+       taken from a side on silhouette.
+
+       Two things make it read, and both were missing from earlier drafts. The
+       torso is close to horizontal, not steeply dropped. And the small wedge of
+       background between the torso underside, the front leg and the lower arm
+       has to stay open; when it closes the figure turns into a letterform.
+
+       Limbs carry different weights on purpose: thigh roughly twice the arm.
+       Uniform strokes read as a stick figure, not a body.
+
+       One palette in every context: a jade tile with the figure knocked out in
+       paper. It does not follow the theme. A mark that restyles itself stops
+       being a mark, and this way the masthead, the browser tab and the home
+       screen icon are all the same object.
+       Note: no double hyphen anywhere in this comment, XML forbids it. -->
+  <rect width="512" height="512" fill="#006b66"/>
+  <g fill="none" stroke="#f7f4ef" stroke-linecap="round" stroke-linejoin="round">
+    <!-- legs, apex at the hip: the big triangle the pose is named for -->
+    <path d="M82 443 L224 263 L370 441" stroke-width="38"/>
+    <!-- feet, which put the figure on the floor rather than on its toes -->
+    <path d="M370 441 L424 443" stroke-width="22"/>
+    <path d="M82 443 L58 446" stroke-width="22"/>
+    <!-- torso: hip to shoulder, near horizontal and the heaviest stroke -->
+    <path d="M224 260 L360 230" stroke-width="44"/>
+    <!-- arms: thin, one up to the ceiling, one down to the shin -->
+    <path d="M341 63 L360 230" stroke-width="20"/>
+    <path d="M360 240 L362 394" stroke-width="20"/>
+  </g>
+  <!-- head beyond the shoulder, touching the end of the torso -->
+  <circle cx="404" cy="246" r="27" fill="#f7f4ef"/>
+</svg>
