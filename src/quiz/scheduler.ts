@@ -158,7 +158,16 @@ export function boxDistribution(
 export interface ProgressSummary {
   total: number
   seen: number
+  /** Everything a session can draw on: unseen plus review that has come round. */
   due: number
+  /**
+   * Due for review only, excluding the never seen.
+   *
+   * Separate from `due` because they answer different questions. A session
+   * needs "how much could I study", but on screen that number sits next to the
+   * count of new questions and reads as a duplicate of it.
+   */
+  reviewDue: number
   /** Questions sitting in the top box. */
   mastered: number
 }
@@ -170,6 +179,7 @@ export function summarise(
 ): ProgressSummary {
   let seen = 0
   let due = 0
+  let reviewDue = 0
   let mastered = 0
 
   for (const question of questions) {
@@ -177,11 +187,14 @@ export function summarise(
     if (record) {
       seen++
       if (record.box >= MAX_BOX) mastered++
-      if (isDue(record, now)) due++
+      if (isDue(record, now)) {
+        due++
+        reviewDue++
+      }
     } else {
       due++
     }
   }
 
-  return { total: questions.length, seen, due, mastered }
+  return { total: questions.length, seen, due, reviewDue, mastered }
 }

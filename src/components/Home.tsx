@@ -104,8 +104,10 @@ export default function Home({
         <div className="label">Progress</div>
         <div className="stats">
           <div>
-            <div className="stat-value">{stats.due}</div>
-            <div className="stat-label">Due</div>
+            {/* Reviews only. The count of new questions is right below in the
+                box row, and showing it twice read as a mistake. */}
+            <div className="stat-value">{stats.reviewDue}</div>
+            <div className="stat-label">Review</div>
           </div>
           <div>
             <div className="stat-value">{stats.seen}</div>

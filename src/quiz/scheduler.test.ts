@@ -180,7 +180,7 @@ describe('boxDistribution', () => {
 describe('summarise', () => {
   it('counts unseen questions as due', () => {
     const stats = summarise(['a', 'b'].map(question), {}, NOW)
-    expect(stats).toEqual({ total: 2, seen: 0, due: 2, mastered: 0 })
+    expect(stats).toEqual({ total: 2, seen: 0, due: 2, reviewDue: 0, mastered: 0 })
   })
 
   it('counts top-box questions as mastered', () => {
@@ -188,6 +188,19 @@ describe('summarise', () => {
       a: { box: MAX_BOX, lastSeen: NOW, correct: 5, incorrect: 0 },
     }
     const stats = summarise(['a', 'b'].map(question), progress, NOW)
-    expect(stats).toEqual({ total: 2, seen: 1, due: 1, mastered: 1 })
+    expect(stats).toEqual({ total: 2, seen: 1, due: 1, reviewDue: 0, mastered: 1 })
+  })
+
+  it('keeps review separate from new, which the box row already shows', () => {
+    const progress: Progress = {
+      // Seen, box 1, last seen long enough ago to have come round again.
+      a: { box: 1, lastSeen: NOW - 30 * DAY, correct: 0, incorrect: 1 },
+      // Seen but not due for weeks.
+      b: { box: MAX_BOX, lastSeen: NOW, correct: 5, incorrect: 0 },
+    }
+    const stats = summarise(['a', 'b', 'c'].map(question), progress, NOW)
+    expect(stats.reviewDue).toBe(1)
+    // Unseen 'c' still counts towards what a session can draw on.
+    expect(stats.due).toBe(2)
   })
 })
