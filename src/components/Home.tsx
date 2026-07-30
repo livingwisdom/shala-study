@@ -59,9 +59,20 @@ export default function Home({
   return (
     <>
       <header className="header">
-        <div>
-          <h1>Shala Study</h1>
-          <p className="subtitle">Ashtanga primary series</p>
+        <div className="masthead">
+          {/* Same file the browser tab uses, so the mark has one source.
+              BASE_URL keeps it correct under the Pages subdirectory. */}
+          <img
+            className="mark"
+            src={`${import.meta.env.BASE_URL}favicon.svg`}
+            alt=""
+            width="44"
+            height="44"
+          />
+          <div>
+            <h1>Shala Study</h1>
+            <p className="subtitle">Ashtanga primary series</p>
+          </div>
         </div>
       </header>
 

@@ -186,6 +186,19 @@ button:focus-visible {
   margin-bottom: var(--space-5);
 }
 
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* The mark carries its own dark tile, so it needs rounding to sit on a light
+   page and nothing else. */
+.mark {
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
 .subtitle {
   color: var(--text-dim);
   font-size: var(--text-xs);
