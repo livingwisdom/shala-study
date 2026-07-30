@@ -401,6 +401,54 @@ button:focus-visible {
   white-space: pre-wrap;
 }
 
+/* Self-grading after free recall. These two are the same shape and sit side by
+   side, so they get a mark and a tint as well as a word -- three channels,
+   because right/wrong in red and green is the one pair colour blindness takes
+   away. */
+.self-grade {
+  margin-top: var(--space-4);
+}
+
+.btn-grade {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-weight: 500;
+}
+
+.grade-icon {
+  font-size: 1.15em;
+  line-height: 1;
+}
+
+.btn-grade.got {
+  border-color: var(--correct);
+  background: color-mix(in srgb, var(--correct) 12%, var(--surface));
+}
+
+.btn-grade.got:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--correct) 24%, var(--surface));
+}
+
+.btn-grade.got .grade-icon {
+  color: var(--correct);
+}
+
+.btn-grade.miss {
+  border-color: var(--incorrect);
+  background: color-mix(in srgb, var(--incorrect) 12%, var(--surface));
+}
+
+.btn-grade.miss:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--incorrect) 24%, var(--surface));
+}
+
+.btn-grade.miss .grade-icon {
+  color: var(--incorrect);
+}
+
 .flag {
   display: inline-block;
   font-size: var(--text-2xs);

@@ -126,11 +126,17 @@ export default function QuizView({ questions, onAnswer, onExit }: Props) {
               {question.explanation && (
                 <p className="subtitle">{question.explanation}</p>
               )}
-              <div className="row" style={{ marginTop: '1rem' }}>
-                <button style={{ flex: 1 }} onClick={() => selfGrade(false)}>
+              <div className="row self-grade">
+                <button className="btn-grade miss" onClick={() => selfGrade(false)}>
+                  <span className="grade-icon" aria-hidden="true">
+                    ✗
+                  </span>
                   Missed it
                 </button>
-                <button style={{ flex: 1 }} onClick={() => selfGrade(true)}>
+                <button className="btn-grade got" onClick={() => selfGrade(true)}>
+                  <span className="grade-icon" aria-hidden="true">
+                    ✓
+                  </span>
                   Got it
                 </button>
               </div>
