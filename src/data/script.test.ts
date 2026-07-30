@@ -154,4 +154,23 @@ describe('divergence from the source document', () => {
       expect(step.correctedFrom).not.toBe(step.cue)
     }
   })
+
+  describe('title casing', () => {
+    // The document writes titles lowercase and sequence.ts writes them capped,
+    // so questions built from the two sources disagreed about the same pose.
+    it('capitalises block titles, single letters included', () => {
+      expect(getScriptBlock('surya-namaskara-a')?.title).toBe('Surya Namaskara A')
+      expect(getScriptBlock('paschimottanasana-a')?.title).toBe('Paschimottanasana A')
+    })
+
+    it('leaves a parenthetical note alone, since it is not part of the name', () => {
+      expect(getScriptBlock('utkatasana')?.title).toBe('Utkatasana (through vinyasa)')
+    })
+
+    it('capitalises every title', () => {
+      for (const block of TEACHING_SCRIPT) {
+        expect(block.title[0]).toBe(block.title[0]?.toUpperCase())
+      }
+    })
+  })
 })

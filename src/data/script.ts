@@ -210,7 +210,12 @@ const CATURANGA_EXIT: readonly ScriptStep[] = [
   s(13, 'exhale', 'downward facing dog'),
 ]
 
-export const TEACHING_SCRIPT: readonly PoseScript[] = [
+/**
+ * The blocks as transcribed. Titles keep the document's casing here, which is
+ * mostly lowercase and not quite consistent ("paschimottanasana A"); they are
+ * capitalised on the way out, below.
+ */
+const TRANSCRIBED_SCRIPT: readonly PoseScript[] = [
   {
     id: 'surya-namaskara-a',
     title: 'surya namaskara a',
@@ -967,6 +972,26 @@ export const TEACHING_SCRIPT: readonly PoseScript[] = [
     ],
   },
 ]
+
+/**
+ * Capitalises a pose name for display: "surya namaskara a" reads as
+ * "Surya Namaskara A", matching the names in `sequence.ts` so the two sources
+ * don't produce differently-cased questions about the same pose.
+ *
+ * Anything from an opening bracket onward is left alone -- "(through vinyasa)"
+ * is a note about the block, not part of its name.
+ */
+function titleCase(title: string): string {
+  const bracket = title.indexOf('(')
+  const name = bracket === -1 ? title : title.slice(0, bracket)
+  const rest = bracket === -1 ? '' : title.slice(bracket)
+  return name.replace(/\S+/g, (word) => word.charAt(0).toUpperCase() + word.slice(1)) + rest
+}
+
+/** The script as the app shows it: transcribed content, display casing. */
+export const TEACHING_SCRIPT: readonly PoseScript[] = TRANSCRIBED_SCRIPT.map(
+  (block) => ({ ...block, title: titleCase(block.title) }),
+)
 
 const SCRIPT_BY_POSE = new Map<string, PoseScript>()
 for (const block of TEACHING_SCRIPT) {
