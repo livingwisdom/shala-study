@@ -13,6 +13,8 @@
  * the scheduling rules are testable without faking timers.
  */
 
+import type { Rng } from './random'
+import { shuffle } from './random'
 import type { Question } from './types'
 
 export const MAX_BOX = 5
@@ -82,12 +84,19 @@ export function timeUntilDue(record: ProgressRecord | undefined, now: number): n
  * then due questions worst-known-first. Nothing that isn't due is included --
  * if you've cleared the queue, the app should tell you so rather than padding
  * the session with questions you already know.
+ *
+ * The unseen block is shuffled because the pool arrives in practice order.
+ * Unshuffled, a first session is twenty consecutive counts of Surya Namaskara A
+ * and nothing else, and "what comes after dve?" is answerable from the question
+ * before it rather than from memory. `rng` is a parameter for the same reason
+ * `now` is: the caller owns the nondeterminism, so tests can pin it.
  */
 export function selectSession(
   questions: readonly Question[],
   progress: Progress,
   now: number,
   limit: number,
+  rng: Rng,
 ): Question[] {
   const unseen: Question[] = []
   const due: Question[] = []
@@ -106,7 +115,44 @@ export function selectSession(
     return (recordA?.lastSeen ?? 0) - (recordB?.lastSeen ?? 0)
   })
 
-  return [...unseen, ...due].slice(0, limit)
+  return [...shuffle(unseen, rng), ...due].slice(0, limit)
+}
+
+export interface BoxDistribution {
+  /** Never answered. */
+  unseen: number
+  /** Index 0 is unused; boxes are 1-indexed, matching BOX_INTERVAL_DAYS. */
+  boxes: readonly number[]
+}
+
+/**
+ * Counts questions per box.
+ *
+ * The lone "mastered" number can't move within a sitting -- box 5 is four
+ * correct answers and eleven days away, and a correct answer isn't due again
+ * for a day, so nothing can be promoted twice in one session. The distribution
+ * shows the same progress at a resolution where one right answer is visible.
+ */
+export function boxDistribution(
+  questions: readonly Question[],
+  progress: Progress,
+): BoxDistribution {
+  const boxes = new Array<number>(MAX_BOX + 1).fill(0)
+  let unseen = 0
+
+  for (const question of questions) {
+    const record = progress[question.id]
+    if (!record) {
+      unseen++
+      continue
+    }
+    // Clamped because these records come back from localStorage, where an old
+    // or hand-edited value could sit outside the range.
+    const box = Math.min(Math.max(record.box, 1), MAX_BOX)
+    boxes[box] = (boxes[box] ?? 0) + 1
+  }
+
+  return { unseen, boxes }
 }
 
 export interface ProgressSummary {

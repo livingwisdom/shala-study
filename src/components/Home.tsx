@@ -5,7 +5,8 @@ import { useMemo } from 'react'
 import { SUBSETS, getSubset } from '../data/subsets'
 import { unansweredEntries } from '../data/questionBank'
 import { topicsInPool } from '../quiz/engine'
-import { summarise, type Progress } from '../quiz/scheduler'
+import { boxDistribution, summarise, type Progress } from '../quiz/scheduler'
+import BoxBar from './BoxBar'
 import { TOPIC_LABELS, type Question, type Topic } from '../quiz/types'
 
 interface Props {
@@ -40,6 +41,7 @@ export default function Home({
     () => summarise(pool, progress, Date.now()),
     [pool, progress],
   )
+  const distribution = useMemo(() => boxDistribution(pool, progress), [pool, progress])
 
   // Topics are computed from the *unfiltered* pool so the filter chips don't
   // vanish as you narrow the selection and strand you with no way back.
@@ -99,14 +101,11 @@ export default function Home({
             <div className="stat-label">Seen</div>
           </div>
           <div>
-            <div className="stat-value">{stats.mastered}</div>
-            <div className="stat-label">Known</div>
-          </div>
-          <div>
             <div className="stat-value">{stats.total}</div>
             <div className="stat-label">Total</div>
           </div>
         </div>
+        <BoxBar distribution={distribution} />
       </div>
 
       <div className="card">

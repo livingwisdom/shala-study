@@ -2,8 +2,10 @@
 // Tests: Leitner promotion, due dates, session selection.
 
 import { describe, expect, it } from 'vitest'
+import { rngFor } from './random'
 import {
   MAX_BOX,
+  boxDistribution,
   grade,
   isDue,
   newRecord,
@@ -19,6 +21,9 @@ const NOW = 1_700_000_000_000
 function question(id: string): Question {
   return { id, topic: 'sequence-order', prompt: id, answer: 'a' }
 }
+
+/** A fresh generator off a fixed seed, so a shuffled session is assertable. */
+const rng = () => rngFor('test-seed')
 
 describe('grade', () => {
   it('promotes one box on a correct answer', () => {
@@ -79,7 +84,7 @@ describe('selectSession', () => {
     const progress: Progress = {
       a: { box: 1, lastSeen: NOW - DAY, correct: 0, incorrect: 1 },
     }
-    const session = selectSession(questions, progress, NOW, 10)
+    const session = selectSession(questions, progress, NOW, 10, rng())
     expect(session[0]?.id).not.toBe('a')
     expect(session).toHaveLength(4)
   })
@@ -91,7 +96,7 @@ describe('selectSession', () => {
       c: { box: 2, lastSeen: NOW - 30 * DAY, correct: 1, incorrect: 1 },
       d: { box: 3, lastSeen: NOW - 30 * DAY, correct: 2, incorrect: 1 },
     }
-    const session = selectSession(questions, progress, NOW, 10)
+    const session = selectSession(questions, progress, NOW, 10, rng())
     expect(session.map((q) => q.id)).toEqual(['b', 'c', 'd', 'a'])
   })
 
@@ -102,11 +107,73 @@ describe('selectSession', () => {
       c: { box: 5, lastSeen: NOW, correct: 5, incorrect: 0 },
       d: { box: 5, lastSeen: NOW, correct: 5, incorrect: 0 },
     }
-    expect(selectSession(questions, progress, NOW, 10)).toHaveLength(0)
+    expect(selectSession(questions, progress, NOW, 10, rng())).toHaveLength(0)
   })
 
   it('respects the session limit', () => {
-    expect(selectSession(questions, {}, NOW, 2)).toHaveLength(2)
+    expect(selectSession(questions, {}, NOW, 2, rng())).toHaveLength(2)
+  })
+
+  /**
+   * The pool arrives in practice order, so taking the first 20 unseen means a
+   * first session of nothing but Surya Namaskara A, in count order.
+   */
+  it('spreads a session across the pool rather than taking it in order', () => {
+    const pool = Array.from({ length: 100 }, (_, i) =>
+      question(`q${String(i).padStart(2, '0')}`),
+    )
+    const ids = selectSession(pool, {}, NOW, 20, rng()).map((q) => q.id)
+
+    expect(ids).toHaveLength(20)
+    expect(ids).not.toEqual(pool.slice(0, 20).map((q) => q.id))
+    // Something from the back half proves it reaches past the opening poses.
+    expect(ids.some((id) => Number(id.slice(1)) >= 50)).toBe(true)
+    expect(new Set(ids).size).toBe(20)
+  })
+
+  it('gives the same order twice for the same seed', () => {
+    const pool = Array.from({ length: 30 }, (_, i) => question(`q${i}`))
+    const first = selectSession(pool, {}, NOW, 20, rngFor('seed')).map((q) => q.id)
+    const second = selectSession(pool, {}, NOW, 20, rngFor('seed')).map((q) => q.id)
+    expect(second).toEqual(first)
+  })
+})
+
+describe('boxDistribution', () => {
+  it('counts unseen questions apart from the boxes', () => {
+    const progress: Progress = {
+      a: { box: 1, lastSeen: NOW, correct: 0, incorrect: 1 },
+      b: { box: 3, lastSeen: NOW, correct: 2, incorrect: 0 },
+    }
+    const distribution = boxDistribution(['a', 'b', 'c', 'd'].map(question), progress)
+    expect(distribution.unseen).toBe(2)
+    expect(distribution.boxes[1]).toBe(1)
+    expect(distribution.boxes[3]).toBe(1)
+    expect(distribution.boxes[5]).toBe(0)
+  })
+
+  it('accounts for every question exactly once', () => {
+    const progress: Progress = {
+      a: { box: 2, lastSeen: NOW, correct: 1, incorrect: 0 },
+      b: { box: MAX_BOX, lastSeen: NOW, correct: 4, incorrect: 0 },
+    }
+    const questions = ['a', 'b', 'c'].map(question)
+    const { unseen, boxes } = boxDistribution(questions, progress)
+    const counted = unseen + boxes.reduce((sum, n) => sum + n, 0)
+    expect(counted).toBe(questions.length)
+  })
+
+  it('clamps a box value that came back out of range', () => {
+    // localStorage is editable and survives version changes; an out-of-range
+    // box must land somewhere rather than vanish from the total.
+    const progress: Progress = {
+      a: { box: 99, lastSeen: NOW, correct: 9, incorrect: 0 },
+      b: { box: 0, lastSeen: NOW, correct: 0, incorrect: 0 },
+    }
+    const { unseen, boxes } = boxDistribution(['a', 'b'].map(question), progress)
+    expect(unseen).toBe(0)
+    expect(boxes[MAX_BOX]).toBe(1)
+    expect(boxes[1]).toBe(1)
   })
 })
 

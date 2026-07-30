@@ -8,6 +8,7 @@ import SequenceBrowser from './components/SequenceBrowser'
 import ScriptView from './components/ScriptView'
 import NeedsAnswers from './components/NeedsAnswers'
 import { buildPool } from './quiz/engine'
+import { rngFor } from './quiz/random'
 import { grade, selectSession, type Progress } from './quiz/scheduler'
 import type { Topic } from './quiz/types'
 import { clearProgress, loadProgress, saveProgress } from './storage/progress'
@@ -38,7 +39,11 @@ export default function App() {
   }, [pool, session])
 
   const startSession = useCallback(() => {
-    const picked = selectSession(pool, progress, Date.now(), SESSION_LIMIT)
+    // Seeded from the start time so each session shuffles differently, while
+    // the picked ids are frozen in state -- a re-render can't reorder a session
+    // you're partway through.
+    const now = Date.now()
+    const picked = selectSession(pool, progress, now, SESSION_LIMIT, rngFor(`session:${now}`))
     if (picked.length === 0) return
     setSession(picked.map((question) => question.id))
     setView('quiz')
