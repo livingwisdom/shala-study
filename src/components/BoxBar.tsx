@@ -4,13 +4,20 @@
 import { MAX_BOX, type BoxDistribution } from '../quiz/scheduler'
 
 /**
- * An ordinal ramp -- one hue, dark to light -- because the boxes are one axis
- * from "just missed" to "known", not five unrelated categories. The steps are
- * spaced for lightness and checked against the card surface; unseen sits
- * outside the ramp in neutral, since "not started" isn't a point on it.
+ * An ordinal ramp -- one hue, five steps -- because the boxes are one axis from
+ * "just missed" to "known", not five unrelated categories. The steps live in
+ * the stylesheet so light and dark can each be stepped against their own
+ * surface; unseen sits outside the ramp in neutral, since "not started" isn't
+ * a point on it.
  */
-const BOX_COLORS = ['#8f5540', '#b06b50', '#cc8263', '#e39c7c', '#f5b99b'] as const
-const UNSEEN_COLOR = 'var(--border)'
+const BOX_COLORS = [
+  'var(--box-1)',
+  'var(--box-2)',
+  'var(--box-3)',
+  'var(--box-4)',
+  'var(--box-5)',
+] as const
+const UNSEEN_COLOR = 'var(--box-unseen)'
 
 interface Cell {
   key: string

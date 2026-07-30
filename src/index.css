@@ -6,18 +6,39 @@
    before. Hierarchy is carried by size, weight and colour rather than by a
    second family. */
 
+/* Light is the default and dark is an override, but neither is a flip of the
+   other -- each set is stepped against its own surface.
+
+   The accent is a teal-leaning jade rather than a leaf green on purpose: a
+   green accent lands about 11 dE from the green that means "correct", which is
+   too close to tell apart even with full colour vision. Pushing the accent
+   blue-ward keeps green free to mean right. */
 :root {
-  --bg: #1c1917;
-  --surface: #292524;
-  --surface-raised: #35302c;
-  --border: #44403c;
-  --text: #f5f5f4;
-  --text-dim: #a8a29e;
-  --accent: #d97757;
-  --accent-dim: #7c4a35;
-  --correct: #6ba368;
-  --incorrect: #c4635a;
-  --warn: #d9a94f;
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --surface-raised: #f1ece4;
+  --border: #ddd5c9;
+  --text: #2a2622;
+  --text-dim: #6f675e;
+  --accent: #006b66;
+  --accent-hover: #005751;
+  --accent-dim: #cfe8e6;
+  /* Text sitting on an accent fill, which is not the page background in light
+     mode -- white on the light accent is 6.4:1. */
+  --on-accent: #ffffff;
+  --correct: #559c1c;
+  --incorrect: #c62f4b;
+  --warn: #a8860b;
+
+  /* Leitner ramp: one hue, pale to deep, stepped for lightness against the
+     card surface. Reversed per mode, since "more known" reads as more ink on
+     light and more light on dark. */
+  --box-unseen: #ddd5c9;
+  --box-1: #7fbdb8;
+  --box-2: #5da39d;
+  --box-3: #3d8882;
+  --box-4: #1f6e68;
+  --box-5: #00544f;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
@@ -41,7 +62,32 @@
   --radius: 10px;
   --max-width: 40rem;
 
-  color-scheme: dark;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1917;
+    --surface: #292524;
+    --surface-raised: #35302c;
+    --border: #44403c;
+    --text: #f5f5f4;
+    --text-dim: #a8a29e;
+    --accent: #4fb5ab;
+    --accent-hover: #6cc7be;
+    --accent-dim: #2a4f4b;
+    --on-accent: #1c1917;
+    --correct: #86dd7f;
+    --incorrect: #e3746a;
+    --warn: #dfb14e;
+
+    --box-unseen: #44403c;
+    --box-1: #2c6862;
+    --box-2: #3c7f78;
+    --box-3: #4d968e;
+    --box-4: #61ada4;
+    --box-5: #79c4bb;
+  }
 }
 
 * {
@@ -117,14 +163,15 @@ button:focus-visible {
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
   font-weight: 600;
   width: 100%;
   padding: var(--space-3);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #e08c6f;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .btn-ghost {
