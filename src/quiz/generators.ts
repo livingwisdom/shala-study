@@ -343,6 +343,9 @@ function nameQuestions(poses: readonly Pose[]): Question[] {
  * Script-sourced answers are stated in the shala's own words and are not
  * flagged; seeded ones carry `unverified` so you always know which you're
  * looking at. Poses whose gaze is genuinely unknown generate nothing.
+ *
+ * Seeded answers describe the pose itself, so they keep the plain wording --
+ * there are no counted steps to hold in the first place.
  */
 function gazeQuestions(poses: readonly Pose[]): Question[] {
   const wordings = new Set<string>()
@@ -367,10 +370,18 @@ function gazeQuestions(poses: readonly Pose[]): Question[] {
             rngFor(`gaze-pool:${pose.id}`),
           )
 
+    // Script gazes are read off held steps only, so the prompt has to say so:
+    // "the gaze in Surya Namaskara A" has no answer -- nine vinyasas look at
+    // three different things -- while the gaze in its held position does.
+    const prompt =
+      resolved.source === 'script'
+        ? `In ${pose.sanskrit}, where is the gaze in the held position?`
+        : `Where is the gaze in ${pose.sanskrit}?`
+
     const base = question(
       `gaze:${pose.id}`,
       'drishti',
-      `Where is the gaze in ${pose.sanskrit}?`,
+      prompt,
       resolved.wording,
       pool,
       resolved.drishti ? `Traditionally: ${resolved.drishti}.` : undefined,

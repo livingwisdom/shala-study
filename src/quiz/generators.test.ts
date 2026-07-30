@@ -206,6 +206,21 @@ describe('gaze', () => {
     expect(find('gaze:parsvottanasana').unverified).toBeUndefined()
   })
 
+  it('asks about the held position, since transitional gazes are excluded', () => {
+    // Surya Namaskara A looks at three different things across nine vinyasas.
+    // Only the held downward dog has an answer, so the prompt must say which.
+    expect(find('gaze:surya-namaskara-a').prompt).toBe(
+      'In Surya Namaskara A, where is the gaze in the held position?',
+    )
+    expect(find('gaze:surya-namaskara-a').answer).toBe('belly')
+  })
+
+  it('keeps the plain wording for seeded gaze, which has no counted steps', () => {
+    expect(find('gaze:marichyasana-c').prompt).toBe(
+      'Where is the gaze in Marichyasana C?',
+    )
+  })
+
   it('flags seeded gaze as unverified', () => {
     // Poses the script doesn't cover fall back to traditional values.
     const seeded = find('gaze:marichyasana-c')
