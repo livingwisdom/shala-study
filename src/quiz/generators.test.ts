@@ -236,6 +236,29 @@ describe('gaze', () => {
   })
 })
 
+describe('uncounted breaths', () => {
+  it('asks the cue and the breath for a mid-block uncounted step', () => {
+    // The count skips this breath, which is exactly why it gets lost.
+    expect(find('script-uncounted-cue:prasarita-padottanasana-a:2').prompt).toBe(
+      'Prasarita Padottanasana A -- what do you say on the uncounted inhale between dve (2) and trini (3)?',
+    )
+    expect(find('script-uncounted-breath:prasarita-padottanasana-a:2').answer).toBe(
+      'inhale',
+    )
+  })
+
+  it('locates a trailing uncounted step by the count before it', () => {
+    expect(find('script-uncounted-cue:surya-namaskara-a:9').answer).toBe('samasthiti')
+    expect(find('script-uncounted-cue:surya-namaskara-a:9').prompt).toContain(
+      'after nava (9)',
+    )
+  })
+
+  it('asks how many a block has', () => {
+    expect(find('uncounted-count:prasarita-padottanasana-a').answer).toBe('3')
+  })
+})
+
 describe('missing data', () => {
   it('generates no breath question where breaths are unrecorded', () => {
     // Shoulderstand holds for a teacher-dependent count, so the data leaves it

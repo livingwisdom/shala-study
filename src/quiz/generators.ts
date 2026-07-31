@@ -459,6 +459,88 @@ function countedSteps(block: PoseScript): ScriptStep[] {
   return block.steps.filter((step) => step.count !== null)
 }
 
+/** "catvari (4)", or the bare number if it's past the Sanskrit list. */
+function countWord(count: number): string {
+  return `${SANSKRIT_COUNT[count - 1] ?? String(count)} (${count})`
+}
+
+/**
+ * The breaths the count doesn't name.
+ *
+ * A block's vinyasa numbers do not cover every breath in it: Prasarita
+ * Padottanasana A takes an uncounted inhale between dve and trini, and most
+ * blocks end on an uncounted exhale back to samasthiti. They're easy to lose
+ * precisely because they have no number to hang on, and a teacher who drops
+ * one leaves the room breathing out of step.
+ *
+ * Located by the counts either side, since that's how you'd find the moment
+ * while leading. Keyed by step index, because a block can hold several.
+ */
+function uncountedQuestions(block: PoseScript): Question[] {
+  const questions: Question[] = []
+
+  block.steps.forEach((step, index) => {
+    if (step.count !== null) return
+
+    const previous = [...block.steps.slice(0, index)]
+      .reverse()
+      .find((candidate) => candidate.count !== null)?.count
+    const next = block.steps
+      .slice(index + 1)
+      .find((candidate) => candidate.count !== null)?.count
+
+    // Nothing counted on either side: no way to say which moment this is.
+    if (previous === null || previous === undefined) {
+      if (next === null || next === undefined) return
+    }
+
+    const where =
+      previous !== null && previous !== undefined && next !== null && next !== undefined
+        ? `between ${countWord(previous)} and ${countWord(next)}`
+        : previous !== null && previous !== undefined
+          ? `after ${countWord(previous)}`
+          : `before ${countWord(next as number)}`
+
+    if (step.cue.trim().length > 0) {
+      questions.push(
+        recall(
+          `script-uncounted-cue:${block.id}:${index}`,
+          'cues',
+          `${block.title} -- what do you say on the uncounted ${step.breath} ${where}?`,
+          step.cue,
+          'Uncounted: the vinyasa number does not advance here.',
+        ),
+      )
+    }
+
+    questions.push(
+      question(
+        `script-uncounted-breath:${block.id}:${index}`,
+        'vinyasa',
+        `${block.title} -- the uncounted breath ${where}: inhale or exhale?`,
+        step.breath,
+        ['inhale', 'exhale'],
+        step.cue,
+      ),
+    )
+  })
+
+  const total = block.steps.filter((step) => step.count === null).length
+  if (total > 0) {
+    questions.push(
+      question(
+        `uncounted-count:${block.id}`,
+        'vinyasa',
+        `How many uncounted breaths are there in ${block.title}?`,
+        String(total),
+        ['1', '2', '3', '4', '0'],
+      ),
+    )
+  }
+
+  return questions
+}
+
 /**
  * The counted method: which vinyasa is held, what's said on each count, and
  * whether it's an inhale or an exhale.
@@ -472,6 +554,8 @@ function scriptQuestions(poses: readonly Pose[]): Question[] {
   for (const block of blocks) {
     const counted = countedSteps(block)
     const held = block.steps.filter((step) => step.hold)
+
+    questions.push(...uncountedQuestions(block))
 
     // Which count is held -- the heart of "what are the held positions?"
     if (held.length === 1) {
