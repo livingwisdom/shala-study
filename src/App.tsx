@@ -7,10 +7,16 @@ import QuizView from './components/QuizView'
 import SequenceBrowser from './components/SequenceBrowser'
 import ScriptView from './components/ScriptView'
 import NeedsAnswers from './components/NeedsAnswers'
+import { getPose } from './data/sequence'
 import { getSubset, subsetLabel } from './data/subsets'
 import { buildPool } from './quiz/engine'
 import { rngFor } from './quiz/random'
-import { grade, selectSession, type Progress } from './quiz/scheduler'
+import {
+  grade,
+  padSession,
+  selectSession,
+  type Progress,
+} from './quiz/scheduler'
 import type { Topic } from './quiz/types'
 import { clearProgress, loadProgress, saveProgress } from './storage/progress'
 
@@ -31,13 +37,22 @@ export default function App() {
   const [topics, setTopics] = useState<readonly Topic[]>([])
   const [progress, setProgress] = useState<Progress>(loadProgress)
   const [session, setSession] = useState<readonly string[]>([])
+  // Set by tapping a pose in the browser; cleared when the session ends, so a
+  // narrowed pool can't quietly persist into the next sitting.
+  const [focusPoseId, setFocusPoseId] = useState<string | null>(null)
 
-  const pool = useMemo(() => buildPool({ subsetId, topics }), [subsetId, topics])
+  const pool = useMemo(
+    () => buildPool({ subsetId, topics, ...(focusPoseId ? { poseId: focusPoseId } : {}) }),
+    [subsetId, topics, focusPoseId],
+  )
 
   // Named the same way the question prompts name it, so the header and a
   // scoped prompt never disagree about what you are studying.
   const subset = getSubset(subsetId)
-  const sequenceName = subset ? subsetLabel(subset) : ''
+  const focusPose = focusPoseId === null ? undefined : getPose(focusPoseId)
+  const sequenceName = [subset ? subsetLabel(subset) : '', focusPose?.sanskrit]
+    .filter(Boolean)
+    .join(' · ')
 
   const sessionQuestions = useMemo(() => {
     const byId = new Map(pool.map((question) => [question.id, question]))
@@ -47,16 +62,31 @@ export default function App() {
     })
   }, [pool, session])
 
-  const startSession = useCallback(() => {
-    // Seeded from the start time so each session shuffles differently, while
-    // the picked ids are frozen in state -- a re-render can't reorder a session
-    // you're partway through.
-    const now = Date.now()
-    const picked = selectSession(pool, progress, now, SESSION_LIMIT, rngFor(`session:${now}`))
-    if (picked.length === 0) return
-    setSession(picked.map((question) => question.id))
-    setView('quiz')
-  }, [pool, progress])
+  const startSession = useCallback(
+    (poseId?: string) => {
+      // Seeded from the start time so each session shuffles differently, while
+      // the picked ids are frozen in state -- a re-render can't reorder a
+      // session you're partway through.
+      const now = Date.now()
+      const rng = rngFor(`session:${now}`)
+      const available = poseId
+        ? buildPool({ subsetId, topics, poseId })
+        : pool
+
+      const due = selectSession(available, progress, now, SESSION_LIMIT, rng)
+      // Focused study pads with what isn't due yet: you picked this pose on
+      // purpose, and "nothing due for it" answers the wrong question.
+      const picked = poseId
+        ? padSession(due, available, SESSION_LIMIT, rngFor(`pad:${now}`))
+        : due
+
+      if (picked.length === 0) return
+      setFocusPoseId(poseId ?? null)
+      setSession(picked.map((question) => question.id))
+      setView('quiz')
+    },
+    [pool, progress, subsetId, topics],
+  )
 
   const recordAnswer = useCallback((questionId: string, correct: boolean) => {
     setProgress((current) => {
@@ -80,13 +110,22 @@ export default function App() {
         questions={sessionQuestions}
         sequenceName={sequenceName}
         onAnswer={recordAnswer}
-        onExit={() => setView('home')}
+        onExit={() => {
+          setFocusPoseId(null)
+          setView('home')
+        }}
       />
     )
   }
 
   if (view === 'browse') {
-    return <SequenceBrowser subsetId={subsetId} onExit={() => setView('home')} />
+    return (
+      <SequenceBrowser
+        subsetId={subsetId}
+        onFocusPose={(poseId) => startSession(poseId)}
+        onExit={() => setView('home')}
+      />
+    )
   }
 
   if (view === 'script') {

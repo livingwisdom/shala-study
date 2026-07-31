@@ -520,6 +520,22 @@ button:focus-visible {
   padding-bottom: 0;
 }
 
+/* The row is a button, but it should read as a list row: no chrome until you
+   touch it. */
+.pose-row {
+  flex: 1;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--space-1) var(--space-2);
+  margin: calc(var(--space-1) * -1) calc(var(--space-2) * -1);
+}
+
+.pose-row:hover:not(:disabled) {
+  background: var(--surface-raised);
+}
+
 .pose-num {
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;

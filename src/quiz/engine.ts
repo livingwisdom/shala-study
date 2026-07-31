@@ -33,6 +33,12 @@ export interface PoolOptions {
   subsetId: string
   /** When empty or omitted, all topics are included. */
   topics?: readonly Topic[]
+  /**
+   * Narrow to one pose, for studying it on its own. Questions belonging to no
+   * particular pose -- the Sanskrit numerals, section counts, the bank -- drop
+   * out, which is the point: they aren't about the pose you picked.
+   */
+  poseId?: string
 }
 
 export function buildPool(options: PoolOptions): Question[] {
@@ -54,11 +60,16 @@ export function buildPool(options: PoolOptions): Question[] {
   const context = subset ? questionContext(subset) : undefined
   const all = [...generateQuestions(poses, context, levels), ...bankQuestions()]
 
+  const focused =
+    options.poseId === undefined
+      ? all
+      : all.filter((question) => question.poseIds?.includes(options.poseId as string))
+
   const topics = options.topics
-  if (!topics || topics.length === 0) return all
+  if (!topics || topics.length === 0) return focused
 
   const wanted = new Set(topics)
-  return all.filter((question) => wanted.has(question.topic))
+  return focused.filter((question) => wanted.has(question.topic))
 }
 
 /** Topics actually present in a pool, for building the filter UI. */

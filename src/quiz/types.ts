@@ -52,4 +52,17 @@ export interface Question {
    * without knowing it.
    */
   unverified?: boolean
+  /**
+   * Which poses the question is about, for studying one pose at a time.
+   *
+   * Declared by the generator rather than parsed back out of the id: an id
+   * names one pose while a question may be about two ("what comes after
+   * Padangusthasana?" is equally about Padahastasana), and pose ids nest --
+   * `padangusthasana` is a substring of `utthita-hasta-padangusthasana`, so
+   * matching on the id quietly over-selects.
+   *
+   * Absent on questions belonging to no particular pose: the Sanskrit
+   * numerals, section counts, the authored bank.
+   */
+  poseIds?: readonly string[]
 }

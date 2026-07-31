@@ -2,15 +2,21 @@
 // Reference list of poses grouped by section.
 
 import { SECTIONS } from '../data/sequence'
-import { getSubset, posesInSubset } from '../data/subsets'
+import { getSubset, posesInSubset, subsetLabel } from '../data/subsets'
 import { resolveGaze } from '../data/gaze'
 
 interface Props {
   subsetId: string
+  /** Study this pose on its own. */
+  onFocusPose: (poseId: string) => void
   onExit: () => void
 }
 
-export default function SequenceBrowser({ subsetId, onExit }: Props) {
+export default function SequenceBrowser({
+  subsetId,
+  onFocusPose,
+  onExit,
+}: Props) {
   const subset = getSubset(subsetId)
   const poses = subset ? posesInSubset(subset) : []
 
@@ -18,8 +24,10 @@ export default function SequenceBrowser({ subsetId, onExit }: Props) {
     <>
       <div className="header">
         <div>
-          <h1>{subset?.name ?? 'Sequence'}</h1>
-          <p className="subtitle">{poses.length} poses</p>
+          <h1>{subset ? subsetLabel(subset) : 'Sequence'}</h1>
+          <p className="subtitle">
+          {poses.length} poses -- tap one to study it on its own
+        </p>
         </div>
         <button className="btn-ghost chip" onClick={onExit}>
           Back
@@ -40,7 +48,12 @@ export default function SequenceBrowser({ subsetId, onExit }: Props) {
                 return (
                   <li className="pose-item" key={pose.id}>
                     <span className="pose-num">{position + 1}</span>
-                    <span>
+                    {/* The whole row is the target: a separate "study" button
+                        would be a small tap area next to a large dead one. */}
+                    <button
+                      className="pose-row"
+                      onClick={() => onFocusPose(pose.id)}
+                    >
                       <span className="pose-sanskrit">{pose.sanskrit}</span>
                       <span className="pose-meta"> · {pose.english}</span>
                       <div className="pose-meta">
@@ -58,7 +71,7 @@ export default function SequenceBrowser({ subsetId, onExit }: Props) {
                           .join(' · ')}
                       </div>
                       {pose.notes && <div className="pose-meta">{pose.notes}</div>}
-                    </span>
+                    </button>
                   </li>
                 )
               })}

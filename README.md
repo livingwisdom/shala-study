@@ -31,14 +31,32 @@ you'll actually lead:
 - What adaptation do you offer someone who can't reach the toe?
 - Where's the gaze in Parsvottanasana?
 - How many poses in the standing sequence? What comes after Janu Sirsasana A?
-- Sanskrit ↔ English names, breath counts, rounds
+- Which breaths aren't counted? (Prasarita Padottanasana takes an uncounted
+  inhale between dve and trini, and most blocks end on one.)
+- Which count does a given cue belong to? Where does a block start and end?
+- Sanskrit ↔ English names, the shala's other names (Trikonasana B, Pyramid
+  Pose), breath counts, rounds
+- Which level first teaches a pose
 - Room opening and closing, mat layout, what to ask students, what you may and
   may not assume, pregnancy and menstruation guidance
 
-That's 750 questions at Fundamentals Beginner, rising to 865 at Advanced, 913
-for Half Primary and 997 for Full Primary. Ones you miss come back sooner; ones
-you know come back weeks later. Sessions are twenty questions, about ten
-minutes.
+That's 1087 questions at Fundamentals Beginner, rising to 1210 at Advanced,
+1211 for Half Primary and 1295 for Full Primary. Ones you miss come back
+sooner; ones you know come back weeks later. Sessions are twenty questions,
+about ten minutes.
+
+## studying one pose
+
+If a single pose keeps slipping -- the bind, the count, the cue you always
+fumble -- open **Browse sequence** and tap it. That starts a session on that
+pose alone: its names, its gaze and breath count, what comes before and after
+it, and its whole script block, cue by cue. Thirty to fifty questions
+depending on the pose.
+
+A focused session takes what's due first and then keeps going with what isn't,
+because you picked that pose on purpose and "nothing due for it" would be the
+wrong answer. Everything you answer still counts towards normal review. The
+focus lasts for that session only.
 
 There's also a **teaching script** view -- the whole script in large type, with
 count, breath, gaze and adaptations pulled out, sized to read while standing.

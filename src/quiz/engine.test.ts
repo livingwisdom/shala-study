@@ -40,6 +40,69 @@ describe('buildPool', () => {
     }
   })
 
+  describe('studying one pose', () => {
+    it('keeps only questions about that pose', () => {
+      const pool = buildPool({
+        subsetId: 'fundamentals-beginner',
+        poseId: 'padangusthasana',
+      })
+      expect(pool.length).toBeGreaterThan(10)
+      for (const question of pool) {
+        expect(question.poseIds, `${question.id} is not about the pose`).toContain(
+          'padangusthasana',
+        )
+      }
+    })
+
+    it('does not over-select on a pose id that nests inside another', () => {
+      // `padangusthasana` is a substring of `utthita-hasta-padangusthasana`, so
+      // matching on the id rather than the declared poses quietly pulls in the
+      // wrong block. This is why questions declare what they're about.
+      const pool = buildPool({
+        subsetId: 'fundamentals-beginner',
+        poseId: 'padangusthasana',
+      })
+      expect(
+        pool.some((question) => question.id.includes('utthita-hasta')),
+      ).toBe(false)
+    })
+
+    it('includes adjacency from both sides', () => {
+      // "What comes after Padangusthasana?" and "what comes before
+      // Padahastasana?" are both about Padangusthasana.
+      const ids = buildPool({
+        subsetId: 'fundamentals-beginner',
+        poseId: 'padangusthasana',
+      }).map((question) => question.id)
+      expect(ids).toContain('next:padangusthasana')
+      expect(ids).toContain('prev:padangusthasana')
+      // The pose before it is Surya Namaskara B, and "what comes after Surya
+      // Namaskara B?" is equally a question about Padangusthasana.
+      expect(ids).toContain('next:surya-namaskara-b')
+    })
+
+    it('drops questions belonging to no pose', () => {
+      const ids = buildPool({
+        subsetId: 'fundamentals-beginner',
+        poseId: 'padangusthasana',
+      }).map((question) => question.id)
+      expect(ids).not.toContain('sanskrit-count:1')
+      expect(ids.some((id) => id.startsWith('count:'))).toBe(false)
+    })
+  })
+
+  it('declares which poses each question is about', () => {
+    // Only the questions that genuinely belong to no pose may skip it.
+    const global = ['sanskrit-count:', 'count:', 'first:', 'last:', 'bank:']
+    for (const question of buildPool({ subsetId: 'full-primary' })) {
+      if (global.some((prefix) => question.id.startsWith(prefix))) continue
+      expect(
+        question.poseIds?.length,
+        `${question.id} declares no pose`,
+      ).toBeGreaterThan(0)
+    }
+  })
+
   it('never emits an empty prompt or answer', () => {
     for (const question of buildPool({ subsetId: 'full-primary' })) {
       expect(question.prompt.trim()).not.toBe('')

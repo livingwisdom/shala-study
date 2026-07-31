@@ -173,6 +173,29 @@ export function boxDistribution(
   return { unseen, boxes }
 }
 
+/**
+ * Fills a session out to `limit` with questions that aren't due yet.
+ *
+ * For focused study only. You reach for one pose deliberately -- "I keep losing
+ * Marichyasana C" -- and "nothing due for that pose" is a useless answer to it.
+ * What's due still comes first; the rest is padding, shuffled so a short pose
+ * doesn't ask the same tail in the same order every time.
+ */
+export function padSession(
+  picked: readonly Question[],
+  available: readonly Question[],
+  limit: number,
+  rng: Rng,
+): Question[] {
+  if (picked.length >= limit) return [...picked]
+  const taken = new Set(picked.map((question) => question.id))
+  const rest = shuffle(
+    available.filter((question) => !taken.has(question.id)),
+    rng,
+  )
+  return [...picked, ...rest.slice(0, limit - picked.length)]
+}
+
 export interface ProgressSummary {
   total: number
   seen: number

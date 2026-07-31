@@ -142,6 +142,17 @@ function question(
   }
 }
 
+/**
+ * Tags questions with the poses they're about, for studying one pose at a time.
+ *
+ * Applied by the generator that knows, rather than inferred later from the id.
+ * Adjacency questions are about both poses; a script block's questions are
+ * about every pose the block covers.
+ */
+function about(poseIds: readonly string[], questions: Question[]): Question[] {
+  return questions.map((question) => ({ ...question, poseIds }))
+}
+
 /** A free-recall question -- no options, revealed and self-graded. */
 function recall(
   id: string,
@@ -181,14 +192,16 @@ function nextPoseQuestions(
     )
 
     questions.push(
-      question(
-        id,
-        'sequence-order',
-        prompt,
-        next.sanskrit,
-        neighbours(poses, i + 1, i),
-        `${next.sanskrit} -- ${next.english}.`,
-      ),
+      ...about([current.id, next.id], [
+        question(
+          id,
+          'sequence-order',
+          prompt,
+          next.sanskrit,
+          neighbours(poses, i + 1, i),
+          `${next.sanskrit} -- ${next.english}.`,
+        ),
+      ]),
     )
   }
   return questions
@@ -214,14 +227,16 @@ function previousPoseQuestions(
     )
 
     questions.push(
-      question(
-        id,
-        'sequence-order',
-        prompt,
-        previous.sanskrit,
-        neighbours(poses, i - 1, i),
-        `${previous.sanskrit} -- ${previous.english}.`,
-      ),
+      ...about([current.id, previous.id], [
+        question(
+          id,
+          'sequence-order',
+          prompt,
+          previous.sanskrit,
+          neighbours(poses, i - 1, i),
+          `${previous.sanskrit} -- ${previous.english}.`,
+        ),
+      ]),
     )
   }
   return questions
@@ -322,7 +337,7 @@ function poseSectionQuestions(poses: readonly Pose[]): Question[] {
   return poses.flatMap((pose) => {
     const section = getSection(pose.section)
     if (!section) return []
-    return [
+    return about([pose.id], [
       question(
         `section-of:${pose.id}`,
         'section-structure',
@@ -330,7 +345,7 @@ function poseSectionQuestions(poses: readonly Pose[]): Question[] {
         section.name,
         sectionNames,
       ),
-    ]
+    ])
   })
 }
 
@@ -338,7 +353,7 @@ function nameQuestions(poses: readonly Pose[]): Question[] {
   const sanskritPool = poses.map((pose) => pose.sanskrit)
   const englishPool = poses.map((pose) => pose.english)
 
-  return poses.flatMap((pose) => [
+  return poses.flatMap((pose) => about([pose.id], [
     question(
       `en-of:${pose.id}`,
       'names',
@@ -353,7 +368,7 @@ function nameQuestions(poses: readonly Pose[]): Question[] {
       pose.sanskrit,
       shuffle(sanskritPool, rngFor(`sa-pool:${pose.id}`)),
     ),
-  ])
+  ]))
 }
 
 /**
@@ -379,24 +394,26 @@ function aliasQuestions(poses: readonly Pose[]): Question[] {
     if (askable !== undefined) {
       const others = aliases.filter((alias) => alias !== askable)
       questions.push(
-        question(
+        ...about([pose.id], [question(
           `alias-of:${pose.id}`,
           'names',
           `${askable} is another name for which pose?`,
           pose.sanskrit,
           neighbours(poses, index),
           others.length > 0 ? `Also called ${others.join(', ')}.` : undefined,
-        ),
+        )]),
       )
     }
 
     questions.push(
-      recall(
-        `alias:${pose.id}`,
-        'names',
-        `What else does the shala call ${pose.sanskrit}?`,
-        aliases.join(' / '),
-      ),
+      ...about([pose.id], [
+        recall(
+          `alias:${pose.id}`,
+          'names',
+          `What else does the shala call ${pose.sanskrit}?`,
+          aliases.join(' / '),
+        ),
+      ]),
     )
   })
 
@@ -453,14 +470,17 @@ function gazeQuestions(poses: readonly Pose[]): Question[] {
       resolved.drishti ? `Traditionally: ${resolved.drishti}.` : undefined,
     )
 
-    return [resolved.source === 'seeded' ? { ...base, unverified: true } : base]
+    return about(
+      [pose.id],
+      [resolved.source === 'seeded' ? { ...base, unverified: true } : base],
+    )
   })
 }
 
 function breathCountQuestions(poses: readonly Pose[]): Question[] {
   return poses.flatMap((pose) => {
     if (pose.breaths === undefined) return []
-    return [
+    return about([pose.id], [
       question(
         `breaths:${pose.id}`,
         'section-structure',
@@ -468,7 +488,7 @@ function breathCountQuestions(poses: readonly Pose[]): Question[] {
         String(pose.breaths),
         ['5', '8', '10', '3', '1'],
       ),
-    ]
+    ])
   })
 }
 
@@ -479,7 +499,7 @@ function repetitionQuestions(poses: readonly Pose[]): Question[] {
     // Asking from both sources produced one question under two ids, which is
     // two review records for one fact.
     if (scriptForPose(pose.id)?.rounds !== undefined) return []
-    return [
+    return about([pose.id], [
       question(
         `rounds:${pose.id}`,
         'section-structure',
@@ -487,7 +507,7 @@ function repetitionQuestions(poses: readonly Pose[]): Question[] {
         String(pose.repetitions),
         ['3', '5', '1', '2'],
       ),
-    ]
+    ])
   })
 }
 
@@ -616,17 +636,21 @@ function scriptQuestions(
   const questions: Question[] = []
 
   for (const block of blocks) {
+    // Tagged with the block's poses in one place, since every question
+    // below is about whatever the block covers.
+    const blockQuestions: Question[] = []
+
     const counted = countedSteps(block)
     const held = block.steps.filter((step) => step.hold)
 
-    questions.push(...uncountedQuestions(block))
+    blockQuestions.push(...uncountedQuestions(block))
 
     // Which count is held -- the heart of "what are the held positions?"
     if (held.length === 1) {
       const step = held[0]
       if (step && step.count !== null) {
         const word = SANSKRIT_COUNT[step.count - 1] ?? String(step.count)
-        questions.push(
+        blockQuestions.push(
           question(
             `script-held:${block.id}`,
             'held-positions',
@@ -647,7 +671,7 @@ function scriptQuestions(
     // How long the hold is.
     const firstHold = held[0]?.hold
     if (firstHold) {
-      questions.push(
+      blockQuestions.push(
         question(
           `script-hold-breaths:${block.id}`,
           'held-positions',
@@ -660,7 +684,7 @@ function scriptQuestions(
 
     // Rounds, where the script states them.
     if (block.rounds !== undefined) {
-      questions.push(
+      blockQuestions.push(
         question(
           `script-rounds:${block.id}`,
           'section-structure',
@@ -676,7 +700,7 @@ function scriptQuestions(
     const firstCount = counted[0]?.count
     if (firstCount !== undefined && firstCount !== null) {
       const word = SANSKRIT_COUNT[firstCount - 1] ?? String(firstCount)
-      questions.push(
+      blockQuestions.push(
         question(
           `script-start:${block.id}`,
           'vinyasa',
@@ -707,7 +731,7 @@ function scriptQuestions(
         lastCount !== fullLastCount,
         context,
       )
-      questions.push(
+      blockQuestions.push(
         question(
           endsScoped.id,
           'vinyasa',
@@ -729,7 +753,7 @@ function scriptQuestions(
         length !== fullCounted.length,
         context,
       )
-      questions.push(
+      blockQuestions.push(
         question(
           lengthScoped.id,
           'vinyasa',
@@ -781,7 +805,7 @@ function scriptQuestions(
       // Free recall: say the cue. This is the one that actually rehearses
       // teaching, so it's self-graded rather than multiple choice.
       if (cueOccurrences.get(step.cue.trim()) === 1) {
-        questions.push(
+        blockQuestions.push(
           question(
             `script-cue-count:${stepKey}`,
             'cues',
@@ -797,7 +821,7 @@ function scriptQuestions(
 
       if (step.cue.trim().length > 0 && !asked.has(`cue:${count}:${step.cue}`)) {
         asked.add(`cue:${count}:${step.cue}`)
-        questions.push(
+        blockQuestions.push(
           recall(
             `script-cue:${stepKey}`,
             'cues',
@@ -816,7 +840,7 @@ function scriptQuestions(
 
       if (!asked.has(`breath:${count}:${step.breath}`)) {
         asked.add(`breath:${count}:${step.breath}`)
-        questions.push(
+        blockQuestions.push(
           question(
             `script-breath:${stepKey}`,
             'vinyasa',
@@ -832,7 +856,7 @@ function scriptQuestions(
       const adaptation = step.adaptations?.join(' / ')
       if (adaptation && !asked.has(`adaptation:${count}:${adaptation}`)) {
         asked.add(`adaptation:${count}:${adaptation}`)
-        questions.push(
+        blockQuestions.push(
           recall(
             `script-adaptation:${stepKey}`,
             'adaptations',
@@ -843,6 +867,8 @@ function scriptQuestions(
         )
       }
     }
+
+    questions.push(...about(block.poseIds, blockQuestions))
   }
 
   // The counting itself, in the shala's spellings.
@@ -898,13 +924,15 @@ function levelIntroductionQuestions(levels: readonly LevelSet[]): Question[] {
       if (!pose) continue
 
       questions.push(
-        question(
-          `level-of:${poseId}`,
-          'section-structure',
-          `Which level first teaches ${pose.sanskrit}?`,
-          level.name,
-          names,
-        ),
+        ...about([poseId], [
+          question(
+            `level-of:${poseId}`,
+            'section-structure',
+            `Which level first teaches ${pose.sanskrit}?`,
+            level.name,
+            names,
+          ),
+        ]),
       )
     }
   }
