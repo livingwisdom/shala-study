@@ -15,7 +15,7 @@ your browser's site data clears it. On iPhone, adding it to the home screen is
 worth doing for a second reason: Safari discards a plain tab's stored data after
 about a week of not visiting the site.
 
-## What it quizzes you on
+## what it quizzes you on
 
 Pick a sequence -- **Fundamentals**, **Half Primary**, or **Full Primary** -- and
 the questions adapt to it. Fundamentals is built from the shala's own teaching
@@ -39,7 +39,7 @@ Sessions are twenty questions, about ten minutes.
 There's also a **teaching script** view -- the whole script in large type, with
 count, breath, gaze and adaptations pulled out, sized to read while standing.
 
-## Before you rely on it
+## before you rely on it
 
 The script-derived material is the shala's own and is reliable. Everything
 outside it is not:
@@ -56,7 +56,7 @@ outside it is not:
   "(gaze ?)", places where it contradicts itself, and the spellings corrected
   here but not in your document.
 
-## Filling in the gaps
+## filling in the gaps
 
 - `src/data/script.ts` -- the teaching script. The source of truth. Fix a cue
   here and every question about it updates.
@@ -72,7 +72,7 @@ points, both named in `src/data/subsets.ts` -- `FUNDAMENTALS_SEATED_ADDITIONS`
 (within the closing). Add pose ids to those arrays; order doesn't matter, since
 the sequence order is always canonical.
 
-## Development
+## development
 
 ```bash
 npm install
