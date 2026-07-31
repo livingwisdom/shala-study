@@ -23,6 +23,7 @@ import { resolveGaze } from '../data/gaze'
 import {
   SANSKRIT_COUNT,
   resolveScript,
+  scriptForPose,
   type PoseScript,
   type ScriptStep,
 } from '../data/script'
@@ -427,6 +428,10 @@ function breathCountQuestions(poses: readonly Pose[]): Question[] {
 function repetitionQuestions(poses: readonly Pose[]): Question[] {
   return poses.flatMap((pose) => {
     if (pose.repetitions === undefined) return []
+    // The script states rounds for the blocks it teaches, and the script wins.
+    // Asking from both sources produced one question under two ids, which is
+    // two review records for one fact.
+    if (scriptForPose(pose.id)?.rounds !== undefined) return []
     return [
       question(
         `rounds:${pose.id}`,
@@ -540,6 +545,19 @@ function scriptQuestions(poses: readonly Pose[]): Question[] {
     // repeat within a block -- Urdhva Dhanurasana runs 9/10 three times for the
     // three backbends, and the closing seals reuse dasha. Keying on the count
     // alone would collapse those into one question and merge their histories.
+    /*
+     * A count can repeat within a block, and when it does it usually carries
+     * the same cue and the same breath: Urdhva Dhanurasana runs 9/10 three
+     * times for the three backbends, saying the same words each time. Asking
+     * three times keeps three review histories for one fact.
+     *
+     * So a question is emitted once per distinct count-and-answer. A repeat
+     * that says something *different* still gets its own question, because the
+     * answer differs and that is a fact of its own -- which is also why the
+     * step index stays in the id.
+     */
+    const asked = new Set<string>()
+
     for (const [index, step] of counted.entries()) {
       const count = step.count
       if (count === null) continue
@@ -548,7 +566,8 @@ function scriptQuestions(poses: readonly Pose[]): Question[] {
 
       // Free recall: say the cue. This is the one that actually rehearses
       // teaching, so it's self-graded rather than multiple choice.
-      if (step.cue.trim().length > 0) {
+      if (step.cue.trim().length > 0 && !asked.has(`cue:${count}:${step.cue}`)) {
+        asked.add(`cue:${count}:${step.cue}`)
         questions.push(
           recall(
             `script-cue:${stepKey}`,
@@ -566,25 +585,30 @@ function scriptQuestions(poses: readonly Pose[]): Question[] {
         )
       }
 
-      questions.push(
-        question(
-          `script-breath:${stepKey}`,
-          'vinyasa',
-          `${block.title} -- is ${word} (${count}) an inhale or an exhale?`,
-          step.breath,
-          ['inhale', 'exhale'],
-          step.cue,
-        ),
-      )
+      if (!asked.has(`breath:${count}:${step.breath}`)) {
+        asked.add(`breath:${count}:${step.breath}`)
+        questions.push(
+          question(
+            `script-breath:${stepKey}`,
+            'vinyasa',
+            `${block.title} -- is ${word} (${count}) an inhale or an exhale?`,
+            step.breath,
+            ['inhale', 'exhale'],
+            step.cue,
+          ),
+        )
+      }
 
       // Adaptations: the modifications offered for each held pose.
-      if (step.adaptations && step.adaptations.length > 0) {
+      const adaptation = step.adaptations?.join(' / ')
+      if (adaptation && !asked.has(`adaptation:${count}:${adaptation}`)) {
+        asked.add(`adaptation:${count}:${adaptation}`)
         questions.push(
           recall(
             `script-adaptation:${stepKey}`,
             'adaptations',
             `${block.title} -- what adaptation do you offer on ${word} (${count})?`,
-            step.adaptations.join(' / '),
+            adaptation,
             step.cue,
           ),
         )

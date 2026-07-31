@@ -22,6 +22,24 @@ describe('buildPool', () => {
     expect(half).toBeGreaterThan(fundamentals)
   })
 
+  it('never asks the same question twice under two ids', () => {
+    // Two generators both derived the rounds of Surya Namaskara A, one from the
+    // sequence and one from the script, so it was asked twice and kept two
+    // review histories. Identical prompt and answer is one fact.
+    for (const subset of SUBSETS) {
+      const seen = new Map<string, string>()
+      for (const question of buildPool({ subsetId: subset.id })) {
+        const fact = `${question.prompt} ${question.answer}`
+        const previous = seen.get(fact)
+        expect(
+          previous,
+          `${subset.name}: "${question.prompt}" asked as both ${previous} and ${question.id}`,
+        ).toBeUndefined()
+        seen.set(fact, question.id)
+      }
+    }
+  })
+
   it('never emits an empty prompt or answer', () => {
     for (const question of buildPool({ subsetId: 'full-primary' })) {
       expect(question.prompt.trim()).not.toBe('')
