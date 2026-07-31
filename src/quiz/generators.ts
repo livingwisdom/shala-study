@@ -82,11 +82,21 @@ function scoped(
   }
 }
 
+/**
+ * The full series as the questions see it: informal poses removed.
+ *
+ * This is the baseline every "does the answer differ from the full series?"
+ * check compares against, so it has to exclude the same poses the subsets do.
+ * Leaving Balasana in here made even Full Primary look like it diverged from
+ * itself, and scoped ids that should have been plain.
+ */
+const FULL_SERIES = POSES.filter((pose) => !pose.informal)
+
 /** The pose at `offset` from `poseId` in the complete series. */
 function inFullSeries(poseId: string, offset: number): Pose | undefined {
-  const index = POSES.findIndex((pose) => pose.id === poseId)
+  const index = FULL_SERIES.findIndex((pose) => pose.id === poseId)
   if (index < 0) return undefined
-  return POSES[index + offset]
+  return FULL_SERIES[index + offset]
 }
 
 /**
@@ -251,7 +261,9 @@ function sectionCountQuestions(
     const count = poses.filter((pose) => pose.section === section.id).length
     if (count === 0) continue
 
-    const fullCount = POSES.filter((pose) => pose.section === section.id).length
+    const fullCount = FULL_SERIES.filter(
+      (pose) => pose.section === section.id,
+    ).length
     const { id, prompt } = scoped(
       `count:${section.id}`,
       `How many poses are in the ${section.name.toLowerCase()}?`,
@@ -290,7 +302,7 @@ function sectionBoundaryQuestions(
     const last = inSection[inSection.length - 1]
     if (!first || !last) continue
 
-    const fullSection = POSES.filter((pose) => pose.section === section.id)
+    const fullSection = FULL_SERIES.filter((pose) => pose.section === section.id)
 
     const firstScoped = scoped(
       `first:${section.id}`,
@@ -948,10 +960,22 @@ function levelIntroductionQuestions(levels: readonly LevelSet[]): Question[] {
  * subset is one of a group of variations, for the questions that compare them.
  */
 export function generateQuestions(
-  poses: readonly Pose[],
+  allPoses: readonly Pose[],
   context?: SubsetContext,
   levels: readonly LevelSet[] = [],
 ): Question[] {
+  /*
+   * Informal poses generate nothing at all.
+   *
+   * The shala takes rest after headstand without calling it Balasana, so
+   * counting it inflates "how many poses are in the closing?" and asking what
+   * follows the headstand answers with a name nobody says. Dropping them here
+   * rather than in each generator also makes adjacency step over them: what
+   * follows Baddha Hasta Sirsasana B is Yoga Mudra, which is what you'd say
+   * enumerating the sequence. They stay in the browser, where they're true.
+   */
+  const poses = allPoses.filter((pose) => !pose.informal)
+
   return [
     ...levelIntroductionQuestions(levels),
     ...nextPoseQuestions(poses, context),

@@ -22,6 +22,15 @@ export default function SequenceBrowser({
 }: Props) {
   const subset = getSubset(subsetId)
   const poses = subset ? posesInSubset(subset) : []
+  /*
+   * Informal poses are listed but not counted, and so not numbered either.
+   *
+   * Rest after headstand happens; it just isn't one of the poses you'd name if
+   * someone asked what's in the closing. Numbering it here while the questions
+   * exclude it would put two different answers in front of the same person.
+   */
+  const counted = poses.filter((pose) => !pose.informal)
+  const numbers = new Map(counted.map((pose, index) => [pose.id, index + 1]))
 
   return (
     <>
@@ -43,28 +52,32 @@ export default function SequenceBrowser({
       <div className="browse-title">
         <h1>{subset ? subsetLabel(subset) : 'Sequence'}</h1>
         <p className="subtitle">
-          {poses.length} poses -- tap one to study it on its own
+          {counted.length} poses -- tap one to study it on its own
         </p>
       </div>
 
       {SECTIONS.map((section) => {
         const inSection = poses.filter((pose) => pose.section === section.id)
         if (inSection.length === 0) return null
+        const countedHere = inSection.filter((pose) => !pose.informal).length
 
         return (
           <div className="card" key={section.id}>
             <h2>{section.name}</h2>
-            <p className="subtitle">{inSection.length} poses</p>
+            <p className="subtitle">{countedHere} poses</p>
             <ul className="pose-list">
-              {inSection.map((pose, position) => {
+              {inSection.map((pose) => {
                 const gaze = resolveGaze(pose.id)
                 return (
                   <li className="pose-item" key={pose.id}>
-                    <span className="pose-num">{position + 1}</span>
+                    <span className="pose-num">{numbers.get(pose.id) ?? ''}</span>
                     {/* The whole row is the target: a separate "study" button
-                        would be a small tap area next to a large dead one. */}
+                        would be a small tap area next to a large dead one.
+                        Informal poses aren't targets at all -- they generate no
+                        questions, so a tap would open an empty session. */}
                     <button
                       className="pose-row"
+                      disabled={pose.informal}
                       onClick={() => onFocusPose(pose.id)}
                     >
                       <span className="pose-sanskrit">{pose.sanskrit}</span>
@@ -79,6 +92,7 @@ export default function SequenceBrowser({
                           gaze.source === 'seeded' &&
                             `gaze ${gaze.wording.toLowerCase()} (unverified)`,
                           gaze.source === 'unknown' && 'gaze not recorded',
+                          pose.informal && 'not counted',
                         ]
                           .filter(Boolean)
                           .join(' · ')}

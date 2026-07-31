@@ -99,6 +99,17 @@ export interface Pose {
    * count is worse than no count. Fill from the shala's sheet.
    */
   vinyasaCount?: number
+  /**
+   * Happens in the room, but isn't one of the named poses.
+   *
+   * The shala takes rest after headstand without calling it Balasana. It's real
+   * and belongs in the reference, but if someone asks how many poses are in the
+   * closing, it isn't one of them -- so informal poses are shown in the browser
+   * and excluded from every generated question. Counting them would teach a
+   * number the examiner won't be expecting, which is the same reason the
+   * opening and closing chants aren't poses at all.
+   */
+  informal?: boolean
   /** Free-form note shown in the sequence browser. */
   notes?: string
 }

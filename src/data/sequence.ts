@@ -651,16 +651,20 @@ const FINISHING: readonly PoseSeed[] = [
     section: 'finishing',
     hold: 'held',
     drishti: 'nasagrai',
-    notes: 'Rest after headstand, typically matching the headstand hold.',
+    informal: true,
+    notes:
+      'Rest after headstand. The shala doesn\'t name it -- you\'d hear "take ' +
+      'rest here in child\'s pose".',
   },
   {
     id: 'baddha-padmasana',
     sanskrit: 'Baddha Padmasana',
     english: 'Bound Lotus Pose',
     section: 'finishing',
-    hold: 'held',
-    breaths: 5,
+    hold: 'transitional',
     drishti: 'nasagrai',
+    informal: true,
+    notes: 'Passed through, not held, and not called by name.',
   },
   {
     id: 'yoga-mudra',

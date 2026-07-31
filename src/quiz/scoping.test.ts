@@ -58,16 +58,26 @@ describe('subset scoping', () => {
   })
 
   it('shares one record between sequences that agree but differ from primary', () => {
-    // Intermediate and Advanced both put Yoga Mudra after Sirsasana B, where
-    // the full series has Balasana. That is one fact learned once, not twice:
-    // keying by sequence rather than by answer would split it.
+    // Intermediate and Advanced both follow Paschimottanasana B with D, where
+    // the full series has C. That is one fact learned once, not twice: keying
+    // by sequence rather than by answer would split it in two.
     const intermediate = byId(poolFor('fundamentals-intermediate'))
     const advanced = byId(poolFor('fundamentals-advanced'))
-    const id = 'next:sirsasana-b:yoga-mudra'
+    const id = 'next:paschimottanasana-b:paschimottanasana-d'
 
-    expect(intermediate.get(id)?.answer).toBe('Yoga Mudra')
-    expect(advanced.get(id)?.answer).toBe('Yoga Mudra')
+    expect(intermediate.get(id)?.answer).toBe('Paschimottanasana D')
+    expect(advanced.get(id)?.answer).toBe('Paschimottanasana D')
     expect(full.has(id)).toBe(false)
+  })
+
+  it('shares a fact the informal poses used to split', () => {
+    // Every sequence answers Yoga Mudra after the headstand now that Balasana
+    // and Baddha Padmasana generate nothing. It was split three ways when the
+    // full series answered with a pose the shala never names.
+    const intermediate = byId(poolFor('fundamentals-intermediate'))
+    for (const pool of [intermediate, full]) {
+      expect(pool.get('next:sirsasana-b')?.answer).toBe('Yoga Mudra')
+    }
   })
 
   it('still separates sequences that genuinely disagree', () => {

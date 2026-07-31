@@ -111,10 +111,27 @@ describe('adjacency', () => {
 })
 
 describe('section structure', () => {
-  it('counts match the underlying data', () => {
+  it('counts match the underlying data, minus the informal poses', () => {
+    // Rest after headstand happens but isn't one of the poses you'd list.
     for (const section of ['standing', 'seated', 'finishing'] as const) {
-      const expected = posesInSection(section).length
+      const expected = posesInSection(section).filter(
+        (pose) => !pose.informal,
+      ).length
       expect(find(`count:${section}`).answer).toBe(String(expected))
+    }
+  })
+
+  it('steps over informal poses when asking what comes next', () => {
+    // Balasana and Baddha Padmasana sit between them in the data; neither is
+    // an answer anyone would give.
+    expect(find('next:sirsasana-b').answer).toBe('Yoga Mudra')
+    expect(find('prev:yoga-mudra').answer).toBe('Baddha Hasta Sirsasana B')
+  })
+
+  it('asks nothing at all about an informal pose', () => {
+    for (const question of allQuestions) {
+      expect(question.poseIds ?? [], question.id).not.toContain('balasana')
+      expect(question.poseIds ?? [], question.id).not.toContain('baddha-padmasana')
     }
   })
 
