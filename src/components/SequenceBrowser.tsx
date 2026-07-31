@@ -4,9 +4,11 @@
 import { SECTIONS } from '../data/sequence'
 import { getSubset, posesInSubset, subsetLabel } from '../data/subsets'
 import { resolveGaze } from '../data/gaze'
+import SubsetPicker from './SubsetPicker'
 
 interface Props {
   subsetId: string
+  onSubsetChange: (id: string) => void
   /** Study this pose on its own. */
   onFocusPose: (poseId: string) => void
   onExit: () => void
@@ -14,6 +16,7 @@ interface Props {
 
 export default function SequenceBrowser({
   subsetId,
+  onSubsetChange,
   onFocusPose,
   onExit,
 }: Props) {
@@ -33,6 +36,10 @@ export default function SequenceBrowser({
           Back
         </button>
       </div>
+
+      {/* Switch sequence without going back: the list is the thing you're
+          comparing, so the choice belongs on this page too. */}
+      <SubsetPicker subsetId={subsetId} onSubsetChange={onSubsetChange} />
 
       {SECTIONS.map((section) => {
         const inSection = poses.filter((pose) => pose.section === section.id)

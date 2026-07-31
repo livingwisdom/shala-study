@@ -122,6 +122,7 @@ export default function App() {
     return (
       <SequenceBrowser
         subsetId={subsetId}
+        onSubsetChange={setSubsetId}
         onFocusPose={(poseId) => startSession(poseId)}
         onExit={() => setView('home')}
       />
