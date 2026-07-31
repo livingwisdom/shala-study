@@ -195,6 +195,41 @@ describe('cues and adaptations', () => {
   })
 })
 
+describe('the shala\'s other names', () => {
+  it('asks which pose an alias refers to', () => {
+    expect(find('alias-of:parivrtta-trikonasana').answer).toBe('Parivrtta Trikonasana')
+    expect(find('alias-of:parivrtta-trikonasana').prompt).toContain(
+      'Utthita Trikonasana B',
+    )
+    expect(find('alias-of:parsvottanasana').prompt).toContain('Pyramid Pose')
+  })
+
+  it('offers the A/B counterpart as a wrong answer', () => {
+    // The whole hazard of the A/B naming is confusing the two, so the pose it
+    // is most easily mistaken for has to be on the list.
+    expect(find('alias-of:parivrtta-trikonasana').choices).toContain(
+      'Utthita Trikonasana',
+    )
+  })
+
+  it('never asks with a name that contains the answer', () => {
+    // "Utthita Trikonasana A is another name for which pose?" answers itself.
+    for (const question of allQuestions) {
+      if (!question.id.startsWith('alias-of:')) continue
+      expect(
+        question.prompt.includes(question.answer),
+        `${question.id} gives itself away`,
+      ).toBe(false)
+    }
+  })
+
+  it('asks the other direction too, as free recall', () => {
+    const recallQuestion = find('alias:parsvottanasana')
+    expect(recallQuestion.answer).toBe('Pyramid Pose')
+    expect(recallQuestion.choices).toBeUndefined()
+  })
+})
+
 describe('gaze', () => {
   it('prefers the shala’s wording over the traditional drishti', () => {
     // The script says "belly" for downward dog, where books say the nose.

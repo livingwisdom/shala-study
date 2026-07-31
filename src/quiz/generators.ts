@@ -357,6 +357,53 @@ function nameQuestions(poses: readonly Pose[]): Question[] {
 }
 
 /**
+ * The shala's other names for a pose.
+ *
+ * Both directions, because both happen in the room: someone says "Trikonasana
+ * B" and you need the pose, or you're leading and want the name a student will
+ * recognise. The recognition question offers neighbouring poses as the wrong
+ * answers, which puts Utthita Trikonasana next to Parivrtta Trikonasana -- the
+ * confusion the A/B naming actually causes.
+ */
+function aliasQuestions(poses: readonly Pose[]): Question[] {
+  const questions: Question[] = []
+
+  poses.forEach((pose, index) => {
+    const aliases = pose.alsoCalled
+    if (!aliases || aliases.length === 0) return
+
+    // "Utthita Trikonasana A is another name for which pose?" carries its own
+    // answer. Ask with a name that doesn't, or don't ask: "Trikonasana A"
+    // still forces you to know that A is the Utthita one and B the Parivrtta.
+    const askable = aliases.find((alias) => !alias.includes(pose.sanskrit))
+    if (askable !== undefined) {
+      const others = aliases.filter((alias) => alias !== askable)
+      questions.push(
+        question(
+          `alias-of:${pose.id}`,
+          'names',
+          `${askable} is another name for which pose?`,
+          pose.sanskrit,
+          neighbours(poses, index),
+          others.length > 0 ? `Also called ${others.join(', ')}.` : undefined,
+        ),
+      )
+    }
+
+    questions.push(
+      recall(
+        `alias:${pose.id}`,
+        'names',
+        `What else does the shala call ${pose.sanskrit}?`,
+        aliases.join(' / '),
+      ),
+    )
+  })
+
+  return questions
+}
+
+/**
  * Gaze, preferring the shala's script over the seeded traditional drishti.
  *
  * Script-sourced answers are stated in the shala's own words and are not
@@ -787,6 +834,7 @@ export function generateQuestions(
     ...sectionBoundaryQuestions(poses, context),
     ...poseSectionQuestions(poses),
     ...nameQuestions(poses),
+    ...aliasQuestions(poses),
     ...gazeQuestions(poses),
     ...breathCountQuestions(poses),
     ...repetitionQuestions(poses),
