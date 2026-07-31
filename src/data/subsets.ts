@@ -129,7 +129,7 @@ export const SUBSETS: readonly Subset[] = [
     name: 'Beginner',
     group: FUNDAMENTALS_GROUP,
     description:
-      'Seated stops at Janu Sirsasana A, and the closing goes straight to the seals. An example class -- adapt it to the class and the time.',
+      'Seated stops at Janu Sirsasana A, and the closing goes straight to the seals. An example class -- adapt it to the room and the time.',
     poseIds: [
       ...SUN_SALUTATIONS,
       ...STANDING,
@@ -142,7 +142,7 @@ export const SUBSETS: readonly Subset[] = [
     name: 'Intermediate',
     group: FUNDAMENTALS_GROUP,
     description:
-      'Adds Paschimottanasana D, Janu Sirsasana B and C, and the inversions through headstand. An example class -- adapt it to the class and the time.',
+      'Adds Paschimottanasana D, Janu Sirsasana B and C, and the inversions through headstand. An example class -- adapt it to the room and the time.',
     poseIds: [
       ...SUN_SALUTATIONS,
       ...STANDING,
@@ -155,7 +155,7 @@ export const SUBSETS: readonly Subset[] = [
     name: 'Advanced',
     group: FUNDAMENTALS_GROUP,
     description:
-      'Adds Marichyasana A and B, and the full finishing sequence. An example class -- adapt it to the class and the time.',
+      'Adds Marichyasana A and B, and the full finishing sequence. An example class -- adapt it to the room and the time.',
     poseIds: [
       ...SUN_SALUTATIONS,
       ...STANDING,
