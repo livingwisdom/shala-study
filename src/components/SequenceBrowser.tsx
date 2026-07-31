@@ -26,12 +26,9 @@ export default function SequenceBrowser({
   return (
     <>
       <div className="header">
-        <div>
-          <h1>{subset ? subsetLabel(subset) : 'Sequence'}</h1>
-          <p className="subtitle">
-          {poses.length} poses -- tap one to study it on its own
-        </p>
-        </div>
+        {/* Names the view, so the row isn't a lone button against empty space
+            once the sequence title moves down to head the list. */}
+        <div className="label view-label">Browse sequence</div>
         <button className="btn-ghost chip" onClick={onExit}>
           Back
         </button>
@@ -40,6 +37,15 @@ export default function SequenceBrowser({
       {/* Switch sequence without going back: the list is the thing you're
           comparing, so the choice belongs on this page too. */}
       <SubsetPicker subsetId={subsetId} onSubsetChange={onSubsetChange} />
+
+      {/* The title names what the picker just selected, so it reads as the
+          heading of the list below rather than of the page above. */}
+      <div className="browse-title">
+        <h1>{subset ? subsetLabel(subset) : 'Sequence'}</h1>
+        <p className="subtitle">
+          {poses.length} poses -- tap one to study it on its own
+        </p>
+      </div>
 
       {SECTIONS.map((section) => {
         const inSection = poses.filter((pose) => pose.section === section.id)

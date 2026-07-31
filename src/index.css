@@ -208,6 +208,17 @@ button:focus-visible {
   flex-shrink: 0;
 }
 
+/* A view's name in the header, opposite its back button. The label style
+   already carries "this is a heading of something small". */
+.view-label {
+  margin-bottom: 0;
+}
+
+/* The selected sequence, titled beneath the picker that chose it. */
+.browse-title {
+  margin-bottom: var(--space-4);
+}
+
 .subtitle {
   color: var(--text-dim);
   font-size: var(--text-xs);
