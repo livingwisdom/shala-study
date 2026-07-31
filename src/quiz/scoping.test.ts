@@ -82,6 +82,15 @@ describe('subset scoping', () => {
     )
   })
 
+  it('scopes a block whose end moves with the group exit', () => {
+    // Paschimottanasana B carries the group's exit vinyasa when D isn't in the
+    // sequence, so the same block genuinely ends in two different places.
+    expect(
+      fundamentals.get('script-last:paschimottanasana-b:caturdasha-14')?.answer,
+    ).toBe('caturdasha (14)')
+    expect(full.get('script-last:paschimottanasana-b')?.answer).toBe('dasha (10)')
+  })
+
   it('leaves shared facts unscoped so progress carries across subsets', () => {
     // Padangusthasana is followed by Padahastasana in every sequence -- one
     // fact, one record. Re-keying it per subset would make you learn it thrice.

@@ -178,6 +178,43 @@ describe('the counted method', () => {
   })
 })
 
+describe('the shape of a block', () => {
+  it('knows where a block ends and how long it runs', () => {
+    expect(find('script-last:surya-namaskara-a').answer).toBe('nava (9)')
+    expect(find('script-length:surya-namaskara-a').answer).toBe('9')
+    expect(find('script-last:surya-namaskara-b').answer).toBe('saptadasha (17)')
+  })
+})
+
+describe('cues read backwards', () => {
+  it('asks which count a cue belongs to', () => {
+    const question = allQuestions.find(
+      (q) =>
+        q.id.startsWith('script-cue-count:surya-namaskara-a') &&
+        q.prompt.includes('hop or step back'),
+    )
+    expect(question?.answer).toBe('catvari (4)')
+  })
+
+  it('skips cues the block says more than once', () => {
+    // Utthita Hasta Padangusthasana says "fold forward" on four counts, so the
+    // question would have four right answers and accept one.
+    const repeated = allQuestions.filter(
+      (q) =>
+        q.id.startsWith('script-cue-count:utthita-hasta-padangusthasana') &&
+        q.prompt.includes('fold forward'),
+    )
+    expect(repeated).toHaveLength(0)
+  })
+
+  it('offers other counts from the same block as the wrong answers', () => {
+    const question = allQuestions.find((q) =>
+      q.id.startsWith('script-cue-count:surya-namaskara-a'),
+    )
+    expect(question?.choices?.length).toBeGreaterThan(1)
+  })
+})
+
 describe('cues and adaptations', () => {
   it('asks cues as free recall rather than multiple choice', () => {
     // Picking a cue off a list isn't the skill; producing it is.

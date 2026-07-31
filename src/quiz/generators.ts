@@ -592,9 +592,26 @@ function uncountedQuestions(block: PoseScript): Question[] {
  * The counted method: which vinyasa is held, what's said on each count, and
  * whether it's an inhale or an exhale.
  */
-function scriptQuestions(poses: readonly Pose[]): Question[] {
+function scriptQuestions(
+  poses: readonly Pose[],
+  context?: SubsetContext,
+): Question[] {
   const blocks = blocksFor(poses)
   if (blocks.length === 0) return []
+
+  /*
+   * How each block reads in the full series, for the two questions that a cut
+   * can change.
+   *
+   * A group's exit vinyasa attaches to whichever variation is last, so
+   * Paschimottanasana B ends on dasha in Primary and on caturdasha in
+   * Fundamentals Beginner, where it carries the exit that D would otherwise
+   * take. Same block, same id, two answers -- which is the collision `scoped`
+   * exists to prevent.
+   */
+  const fullBlocks = new Map(
+    resolveScript(POSES.map((pose) => pose.id)).map((block) => [block.id, block]),
+  )
 
   const questions: Question[] = []
 
@@ -672,6 +689,72 @@ function scriptQuestions(poses: readonly Pose[]): Question[] {
       )
     }
 
+    // Where the block ends and how long it runs. `script-start` gives the other
+    // end; between them they're the shape of the block, which is what you need
+    // to know you've led it whole.
+    const fullCounted = fullBlocks.get(block.id)
+      ? countedSteps(fullBlocks.get(block.id) as PoseScript)
+      : counted
+
+    const lastCount = counted[counted.length - 1]?.count
+    const fullLastCount = fullCounted[fullCounted.length - 1]?.count
+    if (lastCount !== undefined && lastCount !== null) {
+      const answer = countWord(lastCount)
+      const endsScoped = scoped(
+        `script-last:${block.id}`,
+        `Which count does ${block.title} end on?`,
+        answer,
+        lastCount !== fullLastCount,
+        context,
+      )
+      questions.push(
+        question(
+          endsScoped.id,
+          'vinyasa',
+          endsScoped.prompt,
+          answer,
+          SANSKRIT_COUNT.slice(0, 20).map(
+            (numeral, index) => `${numeral} (${index + 1})`,
+          ),
+        ),
+      )
+    }
+
+    if (counted.length > 0) {
+      const length = counted.length
+      const lengthScoped = scoped(
+        `script-length:${block.id}`,
+        `How many counted breaths does ${block.title} take?`,
+        String(length),
+        length !== fullCounted.length,
+        context,
+      )
+      questions.push(
+        question(
+          lengthScoped.id,
+          'vinyasa',
+          lengthScoped.prompt,
+          String(length),
+          [length + 1, length - 1, length + 2, length - 2, length + 4]
+            .filter((n) => n > 0)
+            .map(String),
+        ),
+      )
+    }
+
+    /*
+     * A cue asked backwards: hear the words, name the count.
+     *
+     * Only where the cue occurs once in the block. Utthita Hasta
+     * Padangusthasana says "fold forward" on four different counts, so asking
+     * which count it belongs to would have four right answers and one accepted.
+     */
+    const cueOccurrences = new Map<string, number>()
+    for (const step of counted) {
+      const cue = step.cue.trim()
+      if (cue.length > 0) cueOccurrences.set(cue, (cueOccurrences.get(cue) ?? 0) + 1)
+    }
+
     // The step index is part of every id below because a count can legitimately
     // repeat within a block -- Urdhva Dhanurasana runs 9/10 three times for the
     // three backbends, and the closing seals reuse dasha. Keying on the count
@@ -697,6 +780,21 @@ function scriptQuestions(poses: readonly Pose[]): Question[] {
 
       // Free recall: say the cue. This is the one that actually rehearses
       // teaching, so it's self-graded rather than multiple choice.
+      if (cueOccurrences.get(step.cue.trim()) === 1) {
+        questions.push(
+          question(
+            `script-cue-count:${stepKey}`,
+            'cues',
+            `${block.title} -- on which count do you say "${step.cue}"?`,
+            countWord(count),
+            counted
+              .map((other) => other.count)
+              .filter((other): other is number => other !== null && other !== count)
+              .map(countWord),
+          ),
+        )
+      }
+
       if (step.cue.trim().length > 0 && !asked.has(`cue:${count}:${step.cue}`)) {
         asked.add(`cue:${count}:${step.cue}`)
         questions.push(
@@ -838,7 +936,7 @@ export function generateQuestions(
     ...gazeQuestions(poses),
     ...breathCountQuestions(poses),
     ...repetitionQuestions(poses),
-    ...scriptQuestions(poses),
+    ...scriptQuestions(poses, context),
   ]
 }
 
