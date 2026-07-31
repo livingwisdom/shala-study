@@ -118,10 +118,14 @@ not fit a phone; three do.
 `App` stores a single leaf subset id, never a group id -- choosing Fundamentals
 selects its `defaultSubsetId`. One piece of state, nothing to reconcile.
 
-Question prompts use `subsetLabel()`, which qualifies a level with its group:
-"In Fundamentals (Beginner)" rather than a bare "In Beginner", which doesn't say
-beginner *what*. Build the generator context with `questionContext()` rather
-than assembling `{id, name}` by hand, so no caller can disagree about the name.
+Everything outside the Level picker names a level in full, via `subsetLabel()`:
+"Fundamentals (Intermediate)", never a bare "Intermediate" -- which to an Ashtangi
+means Second Series, not the middle level of a Fundamentals class. "Beginner"
+alone has the same problem: beginner *what*. The short names survive only on the
+Level buttons, where the group is the button you just pressed.
+
+Build the generator context with `questionContext()` rather than assembling
+`{id, name}` by hand, so no caller can disagree about the name.
 
 ### Group exits are movable, not owned by a pose
 

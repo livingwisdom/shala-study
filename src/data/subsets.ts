@@ -198,12 +198,12 @@ export function getGroup(id: string): SubsetGroup | undefined {
 }
 
 /**
- * How a subset is named inside a question prompt.
+ * How a subset is named anywhere outside the picker.
  *
- * Grouped subsets get their group back: "In Beginner, what comes after Janu
- * Sirsasana A?" doesn't say beginner *what*, while "In Fundamentals (Beginner)"
- * does. The picker still shows the short name, where the group is the button
- * you just pressed.
+ * Grouped subsets always carry their group: "Intermediate" on its own means
+ * Second Series to an Ashtangi, not the middle Fundamentals level, and
+ * "Beginner" alone doesn't say beginner *what*. Only the Level buttons use the
+ * short name, and there the group is the button you just pressed.
  */
 export function subsetLabel(subset: Subset): string {
   const group = subset.group === undefined ? undefined : getGroup(subset.group)

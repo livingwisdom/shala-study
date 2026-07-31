@@ -7,7 +7,13 @@
  */
 
 import { answeredEntries } from '../data/questionBank'
-import { getSubset, posesInSubset, questionContext } from '../data/subsets'
+import {
+  getSubset,
+  posesInSubset,
+  questionContext,
+  subsetLabel,
+  subsetsInGroup,
+} from '../data/subsets'
 import { generateQuestions } from './generators'
 import type { Question, Topic } from './types'
 
@@ -33,8 +39,20 @@ export function buildPool(options: PoolOptions): Question[] {
   const subset = getSubset(options.subsetId)
   const poses = subset ? posesInSubset(subset) : []
 
+  // Studying one level of a group also asks about the group: which level a
+  // pose first appears in is knowledge no single-sequence question covers.
+  const levels =
+    subset?.group === undefined
+      ? []
+      : subsetsInGroup(subset.group).map((level) => ({
+          // The full name, not the short one: an answer of "Intermediate"
+          // reads as Second Series outside the Level picker.
+          name: subsetLabel(level),
+          poseIds: new Set(posesInSubset(level).map((pose) => pose.id)),
+        }))
+
   const context = subset ? questionContext(subset) : undefined
-  const all = [...generateQuestions(poses, context), ...bankQuestions()]
+  const all = [...generateQuestions(poses, context, levels), ...bankQuestions()]
 
   const topics = options.topics
   if (!topics || topics.length === 0) return all

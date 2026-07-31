@@ -37,22 +37,49 @@ describe('subset scoping', () => {
     }
   })
 
-  it('scopes the id when the answer depends on the cut', () => {
-    // Paschimottanasana B is followed by Purvottanasana in Fundamentals (which
-    // takes A and B only) and by C in the full series. Same question id would
+  it('keys by the answer when it depends on the cut', () => {
+    // Paschimottanasana B is followed by Purvottanasana in Beginner (which
+    // takes A and B only) and by C in the full series. One id for both would
     // mean one review record for two different facts.
     expect(fundamentals.has('next:paschimottanasana-b')).toBe(false)
-    expect(fundamentals.get('next:fundamentals-beginner:paschimottanasana-b')?.answer).toBe(
-      'Purvottanasana',
-    )
+    expect(
+      fundamentals.get('next:paschimottanasana-b:purvottanasana')?.answer,
+    ).toBe('Purvottanasana')
     expect(full.get('next:paschimottanasana-b')?.answer).toBe(
       'Paschimottanasana C',
     )
   })
 
   it('says which sequence it means when the answer depends on it', () => {
-    const scopedQuestion = fundamentals.get('next:fundamentals-beginner:paschimottanasana-b')
+    const scopedQuestion = fundamentals.get(
+      'next:paschimottanasana-b:purvottanasana',
+    )
     expect(scopedQuestion?.prompt).toContain('In Fundamentals')
+  })
+
+  it('shares one record between sequences that agree but differ from primary', () => {
+    // Intermediate and Advanced both put Yoga Mudra after Sirsasana B, where
+    // the full series has Balasana. That is one fact learned once, not twice:
+    // keying by sequence rather than by answer would split it.
+    const intermediate = byId(poolFor('fundamentals-intermediate'))
+    const advanced = byId(poolFor('fundamentals-advanced'))
+    const id = 'next:sirsasana-b:yoga-mudra'
+
+    expect(intermediate.get(id)?.answer).toBe('Yoga Mudra')
+    expect(advanced.get(id)?.answer).toBe('Yoga Mudra')
+    expect(full.has(id)).toBe(false)
+  })
+
+  it('still separates sequences that genuinely disagree', () => {
+    // Beginner goes to the backbend after Janu Sirsasana A; Intermediate goes
+    // on to Janu Sirsasana B, which is also what the full series does.
+    const intermediate = byId(poolFor('fundamentals-intermediate'))
+    expect(
+      fundamentals.get('next:janu-sirsasana-a:urdhva-dhanurasana')?.answer,
+    ).toBe('Urdhva Dhanurasana')
+    expect(intermediate.get('next:janu-sirsasana-a')?.answer).toBe(
+      'Janu Sirsasana B',
+    )
   })
 
   it('leaves shared facts unscoped so progress carries across subsets', () => {
@@ -61,7 +88,7 @@ describe('subset scoping', () => {
     for (const pool of [fundamentals, half, full]) {
       expect(pool.get('next:padangusthasana')?.answer).toBe('Padahastasana')
     }
-    expect(fundamentals.has('next:fundamentals-beginner:padangusthasana')).toBe(false)
+    expect(fundamentals.has('next:padangusthasana:padahastasana')).toBe(false)
   })
 
   it('does not clutter unscoped prompts with a sequence name', () => {
@@ -72,15 +99,13 @@ describe('subset scoping', () => {
 
   it('scopes section counts, which shrink with the cut', () => {
     expect(fundamentals.has('count:seated')).toBe(false)
-    expect(fundamentals.get('count:fundamentals-beginner:seated')?.prompt).toContain(
-      'In Fundamentals',
-    )
+    expect(fundamentals.get('count:seated:7')?.prompt).toContain('In Fundamentals')
     expect(full.get('count:seated')).toBeDefined()
   })
 
   it('scopes section boundaries that move', () => {
     // Beginner ends the seated section at Janu Sirsasana A.
-    expect(fundamentals.get('last:fundamentals-beginner:seated')?.answer).toBe(
+    expect(fundamentals.get('last:seated:janu-sirsasana-a')?.answer).toBe(
       'Janu Sirsasana A',
     )
     expect(full.get('last:seated')?.answer).toBe('Setu Bandhasana')
@@ -92,6 +117,44 @@ describe('subset scoping', () => {
     for (const id of full.keys()) {
       expect(id).not.toContain(':full-primary:')
     }
+  })
+
+  describe('which level teaches a pose', () => {
+    const beginnerPool = byId(buildPool({ subsetId: 'fundamentals-beginner' }))
+    const advancedPool = byId(buildPool({ subsetId: 'fundamentals-advanced' }))
+
+    it('answers with the first level that includes it', () => {
+      // Always the qualified name: a bare "Intermediate" reads as Second
+      // Series to an Ashtangi, not as the middle Fundamentals level.
+      expect(beginnerPool.get('level-of:padangusthasana')?.answer).toBe(
+        'Fundamentals (Beginner)',
+      )
+      expect(beginnerPool.get('level-of:salamba-sarvangasana')?.answer).toBe(
+        'Fundamentals (Intermediate)',
+      )
+      expect(beginnerPool.get('level-of:marichyasana-a')?.answer).toBe(
+        'Fundamentals (Advanced)',
+      )
+    })
+
+    it('asks about the whole group, not just the level being studied', () => {
+      // Studying Beginner should still tell you what Advanced adds -- that is
+      // the boundary a teacher gets caught by.
+      expect(beginnerPool.has('level-of:uttana-padasana')).toBe(true)
+    })
+
+    it('keys by pose, so every level builds one history', () => {
+      const id = 'level-of:karnapidasana'
+      expect(beginnerPool.get(id)?.answer).toBe('Fundamentals (Intermediate)')
+      expect(advancedPool.get(id)?.answer).toBe('Fundamentals (Intermediate)')
+    })
+
+    it('stays out of sequences that have no levels', () => {
+      const fullPool = byId(buildPool({ subsetId: 'full-primary' }))
+      expect([...fullPool.keys()].some((id) => id.startsWith('level-of:'))).toBe(
+        false,
+      )
+    })
   })
 
   it('holds across every pair of subsets through the real pool builder', () => {

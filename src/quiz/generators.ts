@@ -40,30 +40,43 @@ export interface SubsetContext {
   name: string
 }
 
+/** Lowercase kebab, for putting an answer inside an id. */
+function slug(answer: string): string {
+  return answer
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
 /**
  * Some facts change with the cut: what follows Paschimottanasana B is
- * Purvottanasana in Fundamentals and Paschimottanasana D in Primary. Section
- * counts and section boundaries move the same way.
+ * Purvottanasana in Fundamentals Beginner and Paschimottanasana D in Primary.
+ * Section counts and section boundaries move the same way.
  *
- * Those questions must be *keyed* separately, or both sequences write to one
- * review record and the scheduler credits you for an answer you never gave.
- * They must also be *phrased* differently, or the question is unanswerable
- * without knowing which sequence is meant.
+ * Those questions must be *phrased* differently, or they're unanswerable
+ * without knowing which sequence is meant. They must also be *keyed* by
+ * something finer than the plain id, or two sequences write to one review
+ * record and the scheduler credits you for an answer you never gave.
  *
- * Questions whose answer is the same either way keep the plain id, so progress
- * is shared -- "Padangusthasana is followed by Padahastasana" is one fact, not
- * three.
+ * The key is the answer, not the sequence. Keying by sequence would split one
+ * fact across every sequence that holds it: Intermediate and Advanced both
+ * answer Yoga Mudra after Sirsasana B, and learning it once should count. What
+ * you actually need to know separately is where the sequences *disagree*, and
+ * that falls out of this automatically -- different answer, different record.
+ *
+ * Questions whose answer matches the full series keep the plain id, so the
+ * ~600 facts that never change are one record each.
  */
 function scoped(
   base: string,
   prompt: string,
+  answer: string,
   differsFromFullSeries: boolean,
   context: SubsetContext | undefined,
 ): { id: string; prompt: string } {
   if (!differsFromFullSeries || !context) return { id: base, prompt }
-  const [kind, ...rest] = base.split(':')
   return {
-    id: `${kind}:${context.id}:${rest.join(':')}`,
+    id: `${base}:${slug(answer)}`,
     prompt: `In ${context.name}, ${prompt.charAt(0).toLowerCase()}${prompt.slice(1)}`,
   }
 }
@@ -161,6 +174,7 @@ function nextPoseQuestions(
     const { id, prompt } = scoped(
       `next:${current.id}`,
       `Which pose comes immediately after ${current.sanskrit}?`,
+      next.sanskrit,
       differs,
       context,
     )
@@ -193,6 +207,7 @@ function previousPoseQuestions(
     const { id, prompt } = scoped(
       `prev:${current.id}`,
       `Which pose comes immediately before ${current.sanskrit}?`,
+      previous.sanskrit,
       differs,
       context,
     )
@@ -224,6 +239,7 @@ function sectionCountQuestions(
     const { id, prompt } = scoped(
       `count:${section.id}`,
       `How many poses are in the ${section.name.toLowerCase()}?`,
+      String(count),
       count !== fullCount,
       context,
     )
@@ -263,6 +279,7 @@ function sectionBoundaryQuestions(
     const firstScoped = scoped(
       `first:${section.id}`,
       `What is the first pose of the ${section.name.toLowerCase()}?`,
+      first.sanskrit,
       fullSection[0]?.id !== first.id,
       context,
     )
@@ -281,6 +298,7 @@ function sectionBoundaryQuestions(
       const lastScoped = scoped(
         `last:${section.id}`,
         `What is the last pose of the ${section.name.toLowerCase()}?`,
+        last.sanskrit,
         fullSection[fullSection.length - 1]?.id !== last.id,
         context,
       )
@@ -591,16 +609,70 @@ function scriptQuestions(poses: readonly Pose[]): Question[] {
 }
 
 /**
+ * One level of a group of variations, for the questions that compare them.
+ *
+ * Passed in rather than imported so the generators keep depending only on the
+ * sequence and the script.
+ */
+export interface LevelSet {
+  name: string
+  poseIds: ReadonlySet<string>
+}
+
+/**
+ * Which level of a variation first teaches each pose.
+ *
+ * This is the question the levels actually raise. Whether Yoga Mudra follows
+ * Sirsasana B is one fact shared by two levels, and drilling it twice teaches
+ * nothing; *which class you'd meet a pose in* is the thing you'd be caught out
+ * by, and no per-pose question asks it.
+ *
+ * Keyed by pose alone. The answer doesn't depend on which level you're
+ * studying, so studying Advanced and studying Beginner build one history.
+ */
+function levelIntroductionQuestions(levels: readonly LevelSet[]): Question[] {
+  if (levels.length < 2) return []
+
+  const names = levels.map((level) => level.name)
+  const seen = new Set<string>()
+  const questions: Question[] = []
+
+  for (const level of levels) {
+    for (const poseId of level.poseIds) {
+      if (seen.has(poseId)) continue
+      seen.add(poseId)
+      const pose = POSES.find((candidate) => candidate.id === poseId)
+      if (!pose) continue
+
+      questions.push(
+        question(
+          `level-of:${poseId}`,
+          'section-structure',
+          `Which level first teaches ${pose.sanskrit}?`,
+          level.name,
+          names,
+        ),
+      )
+    }
+  }
+
+  return questions
+}
+
+/**
  * Every question derivable from the given poses.
  *
  * Pass `context` when generating for a named subset so the questions whose
- * answers depend on the cut get scoped ids and prompts.
+ * answers depend on the cut get scoped ids and prompts. Pass `levels` when the
+ * subset is one of a group of variations, for the questions that compare them.
  */
 export function generateQuestions(
   poses: readonly Pose[],
   context?: SubsetContext,
+  levels: readonly LevelSet[] = [],
 ): Question[] {
   return [
+    ...levelIntroductionQuestions(levels),
     ...nextPoseQuestions(poses, context),
     ...previousPoseQuestions(poses, context),
     ...sectionCountQuestions(poses, context),
