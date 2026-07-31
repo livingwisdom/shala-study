@@ -15,7 +15,13 @@
 
 import type { Progress, ProgressRecord } from '../quiz/scheduler'
 
-const STORAGE_KEY = 'shala-study:progress:v1'
+/**
+ * Renamed from `shala-study:progress:v1` when the app became ytt study, early
+ * enough that nobody had review history worth keeping. Any later rename needs a
+ * migration instead: the origin is the whole github.io account, so a stale key
+ * is not just untidy, it is somebody's progress the app can no longer find.
+ */
+const STORAGE_KEY = 'ytt-study:progress:v1'
 
 function isRecord(value: unknown): value is ProgressRecord {
   if (typeof value !== 'object' || value === null) return false

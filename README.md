@@ -1,4 +1,4 @@
-# Shala Study
+# ytt study
 
 A quiz app for memorising the Ashtanga primary series, built for a teacher
 training course.

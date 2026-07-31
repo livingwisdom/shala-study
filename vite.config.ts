@@ -18,8 +18,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,woff2}'],
       },
       manifest: {
-        name: 'Shala Study',
-        short_name: 'Shala',
+        name: 'ytt study',
+        short_name: 'ytt',
         description: 'Ashtanga primary series study aid for teacher training',
         theme_color: '#1c1917',
         background_color: '#1c1917',
