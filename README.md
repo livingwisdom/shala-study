@@ -41,9 +41,14 @@ you'll actually lead:
   may not assume, pregnancy and menstruation guidance
 
 That's 1087 questions at Fundamentals Beginner, rising to 1210 at Advanced,
-1211 for Half Primary and 1295 for Full Primary. Ones you miss come back
-sooner; ones you know come back weeks later. Sessions are twenty questions,
+1211 for Half Primary and 1295 for Full Primary. Sessions are twenty questions,
 about ten minutes.
+
+Answer one right and it moves out a step -- back tomorrow, then in three days, a
+week, three weeks. Miss it and it returns to the front of the queue whatever it
+had earned before: there's no partial credit, because half-remembering a cue is
+what leaves you stranded in front of a room. So the questions you keep missing
+keep coming back, and the ones you know get out of your way.
 
 ## studying one pose
 

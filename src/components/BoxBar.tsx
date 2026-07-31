@@ -97,8 +97,10 @@ export default function BoxBar({ distribution }: { distribution: BoxDistribution
       </ul>
 
       <p className="subtitle box-caption">
-        Labels are when a question comes back. New ones start on the right;
-        each right answer moves one a box left, and further out.
+        Labels are when a question comes back. New ones start on the right, and
+        each right answer moves a question one box left, further out in time.
+        Miss one and it goes straight back to &ldquo;again&rdquo;, however far
+        left it had reached.
       </p>
     </div>
   )
