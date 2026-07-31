@@ -42,9 +42,14 @@ export const SECTIONS: readonly Section[] = [
     blurb: 'Dandasana through Setu Bandhasana.',
   },
   {
+    id: 'backbends',
+    name: 'Backbends',
+    blurb: 'Urdhva Dhanurasana and its counter-pose.',
+  },
+  {
     id: 'finishing',
     name: 'Finishing Sequence',
-    blurb: 'Urdhva Dhanurasana through rest.',
+    blurb: 'Shoulderstand through rest.',
   },
 ]
 
@@ -195,6 +200,8 @@ const STANDING: readonly PoseSeed[] = [
     breaths: 5,
     bothSides: true,
     drishti: 'padhayoragrai',
+    notes:
+      'The last standing pose the series share. The shala begins intermediate series poses here; primary carries on to Utthita Hasta Padangusthasana.',
   },
   {
     id: 'utthita-hasta-padangusthasana',
@@ -521,12 +528,20 @@ const SEATED: readonly PoseSeed[] = [
   },
 ]
 
-const FINISHING: readonly PoseSeed[] = [
+/**
+ * Backbending and its counter-pose.
+ *
+ * Its own division rather than the head of the finishing sequence, which is how
+ * the tradition treats it and which matters for the second series, where the
+ * backbending grows and the finishing sequence doesn't. The counter-pose sits
+ * with what it counters, so finishing starts cleanly at the shoulderstand.
+ */
+const BACKBENDS: readonly PoseSeed[] = [
   {
     id: 'urdhva-dhanurasana',
     sanskrit: 'Urdhva Dhanurasana',
     english: 'Upward Bow / Wheel Pose',
-    section: 'finishing',
+    section: 'backbends',
     hold: 'held',
     breaths: 5,
     repetitions: 3,
@@ -537,11 +552,14 @@ const FINISHING: readonly PoseSeed[] = [
     id: 'paschimottanasana-closing',
     sanskrit: 'Paschimottanasana',
     english: 'Seated Forward Bend (closing)',
-    section: 'finishing',
+    section: 'backbends',
     hold: 'held',
     drishti: 'padhayoragrai',
     notes: 'Counter-pose after backbends. Breath count varies by teacher.',
   },
+]
+
+const FINISHING: readonly PoseSeed[] = [
   {
     id: 'salamba-sarvangasana',
     sanskrit: 'Salamba Sarvangasana',
@@ -708,6 +726,7 @@ function buildSequence(): readonly Pose[] {
     'surya-namaskara': SURYA_NAMASKARA,
     standing: STANDING,
     seated: SEATED,
+    backbends: BACKBENDS,
     finishing: FINISHING,
   }
 
