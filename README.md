@@ -3,10 +3,17 @@
 A quiz app for memorising the Ashtanga primary series, built for a teacher
 training course.
 
-Open the link, tap **Add to Home Screen**, and it behaves like an app -- on
+**https://livingwisdom.github.io/ytt-study/**
+
+Open that link, tap **Add to Home Screen**, and it behaves like an app -- on
 iPhone and Android both. It works offline, so it's usable in the studio whether
-or not the wifi is. Nothing to install, no account, no cost. Your progress is
-saved on your own device.
+or not the wifi is. Nothing to install, no account, no cost.
+
+Your progress is saved on your own device and never leaves it, which also means
+it isn't backed up and doesn't follow you between phone and laptop. Clearing
+your browser's site data clears it. On iPhone, adding it to the home screen is
+worth doing for a second reason: Safari discards a plain tab's stored data after
+about a week of not visiting the site.
 
 ## What it quizzes you on
 
@@ -25,9 +32,9 @@ script, so it asks about what you'll actually lead:
 - Room opening and closing, mat layout, what to ask students, what you may and
   may not assume, pregnancy and menstruation guidance
 
-That's around 760 questions for Fundamentals. Ones you miss come back sooner;
-ones you know come back weeks later. Sessions are twenty questions, about ten
-minutes.
+That's 745 questions for Fundamentals, 895 for Half Primary and 979 for Full
+Primary. Ones you miss come back sooner; ones you know come back weeks later.
+Sessions are twenty questions, about ten minutes.
 
 There's also a **teaching script** view -- the whole script in large type, with
 count, breath, gaze and adaptations pulled out, sized to read while standing.
