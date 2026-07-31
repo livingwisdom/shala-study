@@ -70,8 +70,8 @@ export default function Home({
             height="44"
           />
           <div>
-            <h1>Shala Study</h1>
-            <p className="subtitle">Ashtanga primary series</p>
+            <h1>shala study</h1>
+            <p className="subtitle">ashtanga primary series</p>
           </div>
         </div>
       </header>
