@@ -23,7 +23,10 @@ const SESSION_LIMIT = 20
 
 export default function App() {
   const [view, setView] = useState<View>('home')
-  const [subsetId, setSubsetId] = useState('fundamentals')
+  // Always a leaf subset, never a group: picking Fundamentals selects one of
+  // its levels, so there is one piece of state here rather than two to keep in
+  // step with each other.
+  const [subsetId, setSubsetId] = useState('fundamentals-beginner')
   const [topics, setTopics] = useState<readonly Topic[]>([])
   const [progress, setProgress] = useState<Progress>(loadProgress)
   const [session, setSession] = useState<readonly string[]>([])

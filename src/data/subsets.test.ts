@@ -2,7 +2,7 @@
 // Tests: subset filtering and sequence-data invariants.
 
 import { describe, expect, it } from 'vitest'
-import { POSES } from './sequence'
+import { POSES, getPose } from './sequence'
 import { SUBSETS, getSubset, posesInSubset } from './subsets'
 
 function resolve(id: string) {
@@ -32,13 +32,61 @@ describe('subsets', () => {
     }
   })
 
-  it('takes Paschimottanasana A and B but not D in fundamentals', () => {
-    // D belongs to Primary. C is in neither -- the shala's script skips it.
-    const ids = resolve('fundamentals').map((pose) => pose.id)
+  it('takes Paschimottanasana A and B but not D at beginner level', () => {
+    // D arrives at intermediate. C is in no Fundamentals level at all.
+    const ids = resolve('fundamentals-beginner').map((pose) => pose.id)
     expect(ids).toContain('paschimottanasana-a')
     expect(ids).toContain('paschimottanasana-b')
     expect(ids).not.toContain('paschimottanasana-c')
     expect(ids).not.toContain('paschimottanasana-d')
+  })
+
+  describe('fundamentals levels', () => {
+    const beginner = resolve('fundamentals-beginner').map((pose) => pose.id)
+    const intermediate = resolve('fundamentals-intermediate').map((pose) => pose.id)
+    const advanced = resolve('fundamentals-advanced').map((pose) => pose.id)
+
+    it('nest, each level containing the one below it', () => {
+      // The pacing sheet describes growth, not three separate classes. If this
+      // fails, a level has been edited in isolation and they have drifted.
+      for (const id of beginner) expect(intermediate).toContain(id)
+      for (const id of intermediate) expect(advanced).toContain(id)
+    })
+
+    it('grow only where the sheet says they do', () => {
+      expect(intermediate).toContain('paschimottanasana-d')
+      expect(intermediate).toContain('janu-sirsasana-c')
+      expect(beginner).not.toContain('janu-sirsasana-b')
+
+      expect(advanced).toContain('marichyasana-b')
+      expect(intermediate).not.toContain('marichyasana-a')
+    })
+
+    it('add the inversions at intermediate and the rest at advanced', () => {
+      expect(beginner).not.toContain('salamba-sarvangasana')
+      expect(intermediate).toContain('salamba-sarvangasana')
+      expect(intermediate).toContain('sirsasana-a')
+      expect(intermediate).toContain('sirsasana-b')
+
+      expect(intermediate).not.toContain('matsyasana')
+      expect(advanced).toContain('matsyasana')
+      expect(advanced).toContain('uttana-padasana')
+    })
+
+    it('share one standing sequence', () => {
+      const standing = (ids: string[]) =>
+        ids.filter((id) => getPose(id)?.section === 'standing')
+      expect(standing(intermediate)).toEqual(standing(beginner))
+      expect(standing(advanced)).toEqual(standing(beginner))
+    })
+
+    it('close with the seals at every level', () => {
+      for (const ids of [beginner, intermediate, advanced]) {
+        expect(ids).toContain('yoga-mudra')
+        expect(ids).toContain('padmasana')
+        expect(ids).toContain('utplutih')
+      }
+    })
   })
 
   it('keeps Paschimottanasana D in full primary', () => {

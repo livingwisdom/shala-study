@@ -89,21 +89,39 @@ shareable as a plain link.
 
 ### Subsets are filters, never separate sequences
 
-`src/data/subsets.ts` defines Fundamentals, Half Primary and Full Primary as
-lists of pose ids selected from the single canonical sequence. `posesInSubset`
-always returns them in canonical practice order regardless of how the id list
-is written.
+`src/data/subsets.ts` defines five subsets as lists of pose ids selected from
+the single canonical sequence: three Fundamentals levels, Half Primary and Full
+Primary. `posesInSubset` always returns them in canonical practice order
+regardless of how the id list is written.
 
 This is what makes subset-aware questions work: generators receive the resolved
 poses, so "what comes after Janu Sirsasana A?" correctly answers *Urdhva
-Dhanurasana* in Fundamentals and *Janu Sirsasana B* in Full Primary, with no
-special-casing.
+Dhanurasana* in Fundamentals Beginner and *Janu Sirsasana B* in Full Primary,
+with no special-casing.
 
-**Fundamentals is derived from the script** via `scriptedPoseIds()` -- it is the
-bare-minimum set. It expands at exactly two points, both marked with named
-constants in `subsets.ts`: `FUNDAMENTALS_SEATED_ADDITIONS` (after Janu Sirsasana
-A, before Navasana) and `FUNDAMENTALS_FINISHING_ADDITIONS` (within the closing).
-Add ids to those arrays; order doesn't matter.
+**The three Fundamentals levels are transcribed from the shala's 60 minute
+pacing sheet** and written *additively*: `INTERMEDIATE_SEATED` spreads
+`BEGINNER_SEATED` and adds to it, and so on through the closings. That is what
+the sheet describes -- one class that grows -- and three hand-copied lists would
+drift apart on the first edit. A test asserts each level contains the one below.
+
+Sun salutations and standing are identical at all three levels; only seated and
+closing grow.
+
+### Groups nest the picker
+
+The levels share `group: 'fundamentals'`, and `SUBSET_GROUPS` names the family.
+The picker shows one button per group plus each ungrouped subset
+(`topLevelChoices()`), then a Level row for the selected group. Five peers do
+not fit a phone; three do.
+
+`App` stores a single leaf subset id, never a group id -- choosing Fundamentals
+selects its `defaultSubsetId`. One piece of state, nothing to reconcile.
+
+Question prompts use `subsetLabel()`, which qualifies a level with its group:
+"In Fundamentals (Beginner)" rather than a bare "In Beginner", which doesn't say
+beginner *what*. Build the generator context with `questionContext()` rather
+than assembling `{id, name}` by hand, so no caller can disagree about the name.
 
 ### Group exits are movable, not owned by a pose
 

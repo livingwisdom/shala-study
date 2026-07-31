@@ -2,7 +2,12 @@
 // Home screen: sequence picker, progress summary, topic filters.
 
 import { useMemo } from 'react'
-import { SUBSETS, getSubset } from '../data/subsets'
+import {
+  getGroup,
+  getSubset,
+  subsetsInGroup,
+  topLevelChoices,
+} from '../data/subsets'
 import { unansweredEntries } from '../data/questionBank'
 import { topicsInPool } from '../quiz/engine'
 import { boxDistribution, summarise, type Progress } from '../quiz/scheduler'
@@ -37,6 +42,14 @@ export default function Home({
   onReset,
 }: Props) {
   const subset = getSubset(subsetId)
+  // The top row is pressed on the *group* when a level is selected, so
+  // Fundamentals stays lit while you move between Beginner and Advanced.
+  const selectedTop = subset?.group ?? subsetId
+  const levels = subset?.group ? subsetsInGroup(subset.group) : []
+
+  /** A group button selects its default level; a plain subset selects itself. */
+  const chooseTop = (choiceId: string) =>
+    getGroup(choiceId)?.defaultSubsetId ?? choiceId
   const stats = useMemo(
     () => summarise(pool, progress, Date.now()),
     [pool, progress],
@@ -79,17 +92,37 @@ export default function Home({
       <div className="card">
         <div className="label">Sequence</div>
         <div className="segmented">
-          {SUBSETS.map((option) => (
+          {topLevelChoices().map((choice) => (
             <button
-              key={option.id}
-              aria-pressed={option.id === subsetId}
-              onClick={() => onSubsetChange(option.id)}
+              key={choice.id}
+              aria-pressed={choice.id === selectedTop}
+              onClick={() => onSubsetChange(chooseTop(choice.id))}
             >
-              {option.name}
+              {choice.name}
             </button>
           ))}
         </div>
-        {subset && <p className="subtitle" style={{ marginTop: '0.6rem' }}>{subset.description}</p>}
+
+        {/* Only groups have levels, so this row appears for Fundamentals and
+            not for Half or Full Primary. */}
+        {levels.length > 0 && (
+          <>
+            <div className="label level-label">Level</div>
+            <div className="segmented">
+              {levels.map((level) => (
+                <button
+                  key={level.id}
+                  aria-pressed={level.id === subsetId}
+                  onClick={() => onSubsetChange(level.id)}
+                >
+                  {level.name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {subset && <p className="subtitle sequence-blurb">{subset.description}</p>}
       </div>
 
       {subset?.needsVerification && (

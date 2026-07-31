@@ -18,8 +18,11 @@ about a week of not visiting the site.
 ## what it quizzes you on
 
 Pick a sequence -- **Fundamentals**, **Half Primary**, or **Full Primary** -- and
-the questions adapt to it. Fundamentals is built from the shala's own teaching
-script, so it asks about what you'll actually lead:
+the questions adapt to it. Fundamentals comes in three levels, **Beginner**,
+**Intermediate** and **Advanced**, taken from the shala's 60 minute class
+pacing sheet: the same class, growing. Each is a typical shape rather than a
+rule, to be adapted to the class and the time. Fundamentals asks about what
+you'll actually lead:
 
 - What do you say on catvari? On sapta? -- the cues, verbatim, from free recall
 - Which count is held in Surya Namaskara B, and for how many breaths?
@@ -32,9 +35,10 @@ script, so it asks about what you'll actually lead:
 - Room opening and closing, mat layout, what to ask students, what you may and
   may not assume, pregnancy and menstruation guidance
 
-That's 745 questions for Fundamentals, 895 for Half Primary and 979 for Full
-Primary. Ones you miss come back sooner; ones you know come back weeks later.
-Sessions are twenty questions, about ten minutes.
+That's 750 questions at Fundamentals Beginner, rising to 865 at Advanced, 913
+for Half Primary and 997 for Full Primary. Ones you miss come back sooner; ones
+you know come back weeks later. Sessions are twenty questions, about ten
+minutes.
 
 There's also a **teaching script** view -- the whole script in large type, with
 count, breath, gaze and adaptations pulled out, sized to read while standing.
@@ -66,11 +70,12 @@ outside it is not:
 - `src/data/sequence.ts` -- the wider primary series, for the poses the script
   doesn't cover.
 
-**Growing Fundamentals:** it's the bare-minimum set today. It expands at two
-points, both named in `src/data/subsets.ts` -- `FUNDAMENTALS_SEATED_ADDITIONS`
-(after Janu Sirsasana A, before Navasana) and `FUNDAMENTALS_FINISHING_ADDITIONS`
-(within the closing). Add pose ids to those arrays; order doesn't matter, since
-the sequence order is always canonical.
+**Changing a Fundamentals level:** the three levels live in
+`src/data/subsets.ts`, written additively -- Intermediate is Beginner plus a few
+poses, Advanced is Intermediate plus a few more. Edit the block a pose belongs
+to (`BEGINNER_SEATED`, `INTERMEDIATE_CLOSING`, and so on) and every level built
+from it follows. Order within a list doesn't matter, since practice order always
+comes from the canonical sequence.
 
 ## development
 

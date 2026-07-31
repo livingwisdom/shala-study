@@ -7,7 +7,7 @@
  */
 
 import { answeredEntries } from '../data/questionBank'
-import { getSubset, posesInSubset } from '../data/subsets'
+import { getSubset, posesInSubset, questionContext } from '../data/subsets'
 import { generateQuestions } from './generators'
 import type { Question, Topic } from './types'
 
@@ -33,7 +33,7 @@ export function buildPool(options: PoolOptions): Question[] {
   const subset = getSubset(options.subsetId)
   const poses = subset ? posesInSubset(subset) : []
 
-  const context = subset ? { id: subset.id, name: subset.name } : undefined
+  const context = subset ? questionContext(subset) : undefined
   const all = [...generateQuestions(poses, context), ...bankQuestions()]
 
   const topics = options.topics

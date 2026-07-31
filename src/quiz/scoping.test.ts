@@ -2,24 +2,21 @@
 // Tests: subset-scoped question ids never disagree on an answer.
 
 import { describe, expect, it } from 'vitest'
-import { SUBSETS, getSubset, posesInSubset } from '../data/subsets'
+import { SUBSETS, getSubset, posesInSubset, questionContext } from '../data/subsets'
 import { generateQuestions } from './generators'
 import { buildPool } from './engine'
 
 function poolFor(subsetId: string) {
   const subset = getSubset(subsetId)
   if (!subset) throw new Error(`No subset ${subsetId}`)
-  return generateQuestions(posesInSubset(subset), {
-    id: subset.id,
-    name: subset.name,
-  })
+  return generateQuestions(posesInSubset(subset), questionContext(subset))
 }
 
 function byId(questions: ReturnType<typeof poolFor>) {
   return new Map(questions.map((question) => [question.id, question]))
 }
 
-const fundamentals = byId(poolFor('fundamentals'))
+const fundamentals = byId(poolFor('fundamentals-beginner'))
 const full = byId(poolFor('full-primary'))
 const half = byId(poolFor('half-primary'))
 
@@ -45,7 +42,7 @@ describe('subset scoping', () => {
     // takes A and B only) and by C in the full series. Same question id would
     // mean one review record for two different facts.
     expect(fundamentals.has('next:paschimottanasana-b')).toBe(false)
-    expect(fundamentals.get('next:fundamentals:paschimottanasana-b')?.answer).toBe(
+    expect(fundamentals.get('next:fundamentals-beginner:paschimottanasana-b')?.answer).toBe(
       'Purvottanasana',
     )
     expect(full.get('next:paschimottanasana-b')?.answer).toBe(
@@ -54,7 +51,7 @@ describe('subset scoping', () => {
   })
 
   it('says which sequence it means when the answer depends on it', () => {
-    const scopedQuestion = fundamentals.get('next:fundamentals:paschimottanasana-b')
+    const scopedQuestion = fundamentals.get('next:fundamentals-beginner:paschimottanasana-b')
     expect(scopedQuestion?.prompt).toContain('In Fundamentals')
   })
 
@@ -64,7 +61,7 @@ describe('subset scoping', () => {
     for (const pool of [fundamentals, half, full]) {
       expect(pool.get('next:padangusthasana')?.answer).toBe('Padahastasana')
     }
-    expect(fundamentals.has('next:fundamentals:padangusthasana')).toBe(false)
+    expect(fundamentals.has('next:fundamentals-beginner:padangusthasana')).toBe(false)
   })
 
   it('does not clutter unscoped prompts with a sequence name', () => {
@@ -75,15 +72,15 @@ describe('subset scoping', () => {
 
   it('scopes section counts, which shrink with the cut', () => {
     expect(fundamentals.has('count:seated')).toBe(false)
-    expect(fundamentals.get('count:fundamentals:seated')?.prompt).toContain(
+    expect(fundamentals.get('count:fundamentals-beginner:seated')?.prompt).toContain(
       'In Fundamentals',
     )
     expect(full.get('count:seated')).toBeDefined()
   })
 
   it('scopes section boundaries that move', () => {
-    // Fundamentals ends the seated section at Janu Sirsasana A.
-    expect(fundamentals.get('last:fundamentals:seated')?.answer).toBe(
+    // Beginner ends the seated section at Janu Sirsasana A.
+    expect(fundamentals.get('last:fundamentals-beginner:seated')?.answer).toBe(
       'Janu Sirsasana A',
     )
     expect(full.get('last:seated')?.answer).toBe('Setu Bandhasana')

@@ -238,18 +238,26 @@ describe('gaze', () => {
 
 describe('missing data', () => {
   it('generates no breath question where breaths are unrecorded', () => {
-    // Shoulderstand and headstand hold for a teacher-dependent count, so the
-    // data leaves them blank rather than asserting a number.
+    // Shoulderstand holds for a teacher-dependent count, so the data leaves it
+    // blank rather than asserting a number. Parvatasana is the same case: the
+    // shala gave the shapes but not the counts.
     expect(
       allQuestions.find((q) => q.id === 'breaths:salamba-sarvangasana'),
     ).toBeUndefined()
-    expect(allQuestions.find((q) => q.id === 'breaths:sirsasana')).toBeUndefined()
+    expect(allQuestions.find((q) => q.id === 'breaths:parvatasana-a')).toBeUndefined()
+    expect(allQuestions.find((q) => q.id === 'breaths:parvatasana-b')).toBeUndefined()
+  })
+
+  it('asks the headstand holds, which the pacing sheet did record', () => {
+    // 15 and 10 traditionally. Blank until the shala supplied them.
+    expect(find('breaths:sirsasana-a').answer).toContain('15')
+    expect(find('breaths:sirsasana-b').answer).toContain('10')
   })
 })
 
 describe('subset awareness', () => {
   it('answers adjacency relative to the subset being studied', () => {
-    const fundamentals = getSubset('fundamentals')
+    const fundamentals = getSubset('fundamentals-beginner')
     if (!fundamentals) throw new Error('missing fundamentals subset')
     const questions = generateQuestions(posesInSubset(fundamentals))
 
@@ -263,7 +271,7 @@ describe('subset awareness', () => {
   })
 
   it('omits script questions for poses outside the subset', () => {
-    const fundamentals = getSubset('fundamentals')
+    const fundamentals = getSubset('fundamentals-beginner')
     if (!fundamentals) throw new Error('missing fundamentals subset')
     const ids = new Set(
       generateQuestions(posesInSubset(fundamentals)).map((q) => q.id),

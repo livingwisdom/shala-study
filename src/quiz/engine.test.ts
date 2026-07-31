@@ -17,7 +17,7 @@ describe('buildPool', () => {
   it('scales the bank with the size of the subset', () => {
     const full = buildPool({ subsetId: 'full-primary' }).length
     const half = buildPool({ subsetId: 'half-primary' }).length
-    const fundamentals = buildPool({ subsetId: 'fundamentals' }).length
+    const fundamentals = buildPool({ subsetId: 'fundamentals-beginner' }).length
     expect(full).toBeGreaterThan(half)
     expect(half).toBeGreaterThan(fundamentals)
   })

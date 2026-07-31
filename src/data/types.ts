@@ -72,6 +72,14 @@ export interface Pose {
   sanskrit: string
   /** Common English name. */
   english: string
+  /**
+   * Other names the shala uses for the same pose, both spoken in the room.
+   *
+   * An alias, not a second pose: Parivrtta Trikonasana and Utthita Trikonasana
+   * B are one posture with one id and one review history. Splitting them would
+   * split your progress on a pose you know perfectly well under either name.
+   */
+  alsoCalled?: readonly string[]
   section: SectionId
   /** Position within the whole practice. Assigned by `buildSequence`. */
   index: number
@@ -111,4 +119,20 @@ export interface Subset {
   poseIds: readonly string[] | 'all'
   /** True when the contents still need checking against the shala's materials. */
   needsVerification?: boolean
+  /**
+   * Group id, for subsets that are variations of one thing.
+   *
+   * The three Fundamentals levels share a group so the picker can nest them:
+   * one button for Fundamentals, then a level underneath, rather than five
+   * peers in a row that don't fit a phone.
+   */
+  group?: string
+}
+
+/** A named family of subsets, shown as one choice in the picker. */
+export interface SubsetGroup {
+  id: string
+  name: string
+  /** Which of its subsets is selected when the group is first chosen. */
+  defaultSubsetId: string
 }
