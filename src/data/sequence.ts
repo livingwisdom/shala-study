@@ -54,12 +54,12 @@ type PoseSeed = Omit<Pose, 'index'>
 const SURYA_NAMASKARA: readonly PoseSeed[] = [
   {
     id: 'samasthiti',
-    sanskrit: 'Samasthih',
+    sanskrit: 'Samasthiti',
     english: 'Equal Standing',
     section: 'surya-namaskara',
     hold: 'held',
     notes:
-      'The starting and returning position. Not counted in the vinyasa count. The shala spells it "samasthih".',
+      'The starting and returning position. Not counted in the vinyasa count.',
   },
   {
     id: 'surya-namaskara-a',
