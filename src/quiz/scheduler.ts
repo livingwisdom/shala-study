@@ -25,6 +25,24 @@ export const MAX_BOX = 5
  */
 const BOX_INTERVAL_DAYS = [0, 0, 1, 3, 7, 21] as const
 
+/**
+ * What a box means, in the terms that matter while studying: when the question
+ * comes back.
+ *
+ * Derived from the table above rather than written out again, so shortening an
+ * interval relabels the chart instead of quietly making it lie.
+ */
+export function boxIntervalLabel(box: number): string {
+  const days = BOX_INTERVAL_DAYS[box] ?? 0
+  if (days === 0) return 'again'
+  if (days === 1) return '1 day'
+  if (days < 7) return `${days} days`
+  // Abbreviated because these are chart labels in a six-column row on a phone:
+  // "3 weeks" wraps and knocks the row out of alignment.
+  const weeks = days / 7
+  return weeks === 1 ? '1 wk' : `${weeks} wks`
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000
 
 export interface ProgressRecord {

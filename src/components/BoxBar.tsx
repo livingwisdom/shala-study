@@ -1,7 +1,7 @@
 // src/components/BoxBar.tsx -- JRS 2026-07-30
 // Stacked bar and legend showing how the pool sits across the Leitner boxes.
 
-import { MAX_BOX, type BoxDistribution } from '../quiz/scheduler'
+import { MAX_BOX, boxIntervalLabel, type BoxDistribution } from '../quiz/scheduler'
 
 /**
  * An ordinal ramp -- one hue, five steps -- because the boxes are one axis from
@@ -22,22 +22,45 @@ const UNSEEN_COLOR = 'var(--box-unseen)'
 interface Cell {
   key: string
   label: string
+  /** Hover text, where the box number is still worth having. */
+  title: string
   count: number
   color: string
 }
 
+/**
+ * Best known first, unstarted last.
+ *
+ * This reads as a progress bar: the pile you haven't touched sits on the right
+ * and retreats as you work, while what you know fills in from the left. New on
+ * the left was the opposite -- a bar that looks full before you have answered
+ * anything.
+ *
+ * The boxes descend so the whole strip is one gradient, deepest at the left
+ * through to the neutral New. Ascending them would put box 5 next to New, the
+ * best known against the least.
+ */
 function cells(distribution: BoxDistribution): Cell[] {
   return [
-    { key: 'new', label: 'New', count: distribution.unseen, color: UNSEEN_COLOR },
     ...Array.from({ length: MAX_BOX }, (_, index) => {
-      const box = index + 1
+      const box = MAX_BOX - index
       return {
         key: `box-${box}`,
-        label: String(box),
+        // When it comes back, not which box it sits in. "3" tells you nothing
+        // you didn't already know from its position in the row.
+        label: boxIntervalLabel(box),
+        title: `Box ${box}`,
         count: distribution.boxes[box] ?? 0,
-        color: BOX_COLORS[index] ?? UNSEEN_COLOR,
+        color: BOX_COLORS[box - 1] ?? UNSEEN_COLOR,
       }
     }),
+    {
+      key: 'new',
+      label: 'new',
+      title: 'Not yet seen',
+      count: distribution.unseen,
+      color: UNSEEN_COLOR,
+    },
   ]
 }
 
@@ -58,7 +81,7 @@ export default function BoxBar({ distribution }: { distribution: BoxDistribution
               key={cell.key}
               className="box-seg"
               style={{ flexGrow: cell.count, background: cell.color }}
-              title={`${cell.label}: ${cell.count}`}
+              title={`${cell.title}: ${cell.count}`}
             />
           ))}
       </div>
@@ -74,8 +97,8 @@ export default function BoxBar({ distribution }: { distribution: BoxDistribution
       </ul>
 
       <p className="subtitle box-caption">
-        Box 1 is just missed, {MAX_BOX} is known. Each right answer moves a
-        question one box right and pushes it further out.
+        Labels are when a question comes back. New ones start on the right;
+        each right answer moves one a box left, and further out.
       </p>
     </div>
   )

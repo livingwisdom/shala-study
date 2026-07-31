@@ -6,6 +6,7 @@ import { rngFor } from './random'
 import {
   MAX_BOX,
   boxDistribution,
+  boxIntervalLabel,
   grade,
   isDue,
   newRecord,
@@ -136,6 +137,24 @@ describe('selectSession', () => {
     const first = selectSession(pool, {}, NOW, 20, rngFor('seed')).map((q) => q.id)
     const second = selectSession(pool, {}, NOW, 20, rngFor('seed')).map((q) => q.id)
     expect(second).toEqual(first)
+  })
+})
+
+describe('boxIntervalLabel', () => {
+  it('says when the box comes back, in the interval table\'s own terms', () => {
+    // Derived, not written out twice: shortening an interval must relabel the
+    // chart rather than leave it quietly lying.
+    expect(boxIntervalLabel(1)).toBe('again')
+    expect(boxIntervalLabel(2)).toBe('1 day')
+    expect(boxIntervalLabel(3)).toBe('3 days')
+    expect(boxIntervalLabel(4)).toBe('1 wk')
+    expect(boxIntervalLabel(MAX_BOX)).toBe('3 wks')
+  })
+
+  it('gives every box a label', () => {
+    for (let box = 1; box <= MAX_BOX; box++) {
+      expect(boxIntervalLabel(box).trim()).not.toBe('')
+    }
   })
 })
 
