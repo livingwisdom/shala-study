@@ -108,10 +108,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* viewport-fit=cover deliberately puts the page under the notch and the home
+   indicator, so every edge has to pay its inset back. The fallbacks matter:
+   env() with no default invalidates the whole calc where insets are unknown,
+   which drops the padding entirely rather than degrading to zero. Left and
+   right are for landscape, where the notch eats a side instead of the top. */
 #root {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: var(--space-5) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+  padding:
+    calc(var(--space-5) + env(safe-area-inset-top, 0px))
+    calc(var(--space-4) + env(safe-area-inset-right, 0px))
+    calc(var(--space-6) + env(safe-area-inset-bottom, 0px))
+    calc(var(--space-4) + env(safe-area-inset-left, 0px));
 }
 
 h1,

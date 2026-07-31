@@ -16,7 +16,12 @@
     <meta name="theme-color" content="#f7f4ef" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1c1917" media="(prefers-color-scheme: dark)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- Not black-translucent: that is what draws the page under the status bar
+         in the first place, and it forces white status text, which disappears
+         on the light theme. "default" lets iOS reserve the bar and tint it from
+         theme-color, which adapts. The safe-area padding in index.css stays
+         either way, for landscape and the home indicator. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>ytt study</title>
   </head>
   <body>
