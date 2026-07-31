@@ -169,6 +169,12 @@ gets repeated in an exam and eventually to a student.
   shala: 15 and 10 for Baddha Hasta Sirsasana A and B, and 10 for the
   shoulderstand, the closing Paschimottanasana, Yoga Mudra and Padmasana.
   Parvatasana A and B are still blank, which is the rule working.
+- **Write notes and cues in the shala's register.** They describe what's
+  offered, not what should happen: "maybe your forehead touches before your
+  hands", never "the forehead usually arrives first". No comparison, nothing
+  that reads as a target. The room's language deliberately avoids ranking
+  students, and a study aid that quietly reintroduces it teaches the wrong
+  thing along with the right one.
 - Empty answers in `questionBank.ts` are deliberate placeholders, not omissions.
   They are excluded from the quiz and listed in the app's "Needs answers" view.
   **Do not fill them from general knowledge** -- especially the pregnancy,

@@ -688,8 +688,8 @@ const FINISHING: readonly PoseSeed[] = [
     section: 'finishing',
     hold: 'held',
     notes:
-      'From A, fold forward until the forehead and hands reach the floor. The ' +
-      'forehead often arrives before the hands. Breath count and gaze not recorded.',
+      'From A, fold forward. Maybe your forehead touches before your hands. ' +
+      'Breath count and gaze not recorded.',
   },
   {
     id: 'padmasana',
