@@ -7,6 +7,7 @@ import QuizView from './components/QuizView'
 import SequenceBrowser from './components/SequenceBrowser'
 import ScriptView from './components/ScriptView'
 import NeedsAnswers from './components/NeedsAnswers'
+import { getSubset, subsetLabel } from './data/subsets'
 import { buildPool } from './quiz/engine'
 import { rngFor } from './quiz/random'
 import { grade, selectSession, type Progress } from './quiz/scheduler'
@@ -32,6 +33,11 @@ export default function App() {
   const [session, setSession] = useState<readonly string[]>([])
 
   const pool = useMemo(() => buildPool({ subsetId, topics }), [subsetId, topics])
+
+  // Named the same way the question prompts name it, so the header and a
+  // scoped prompt never disagree about what you are studying.
+  const subset = getSubset(subsetId)
+  const sequenceName = subset ? subsetLabel(subset) : ''
 
   const sessionQuestions = useMemo(() => {
     const byId = new Map(pool.map((question) => [question.id, question]))
@@ -72,6 +78,7 @@ export default function App() {
     return (
       <QuizView
         questions={sessionQuestions}
+        sequenceName={sequenceName}
         onAnswer={recordAnswer}
         onExit={() => setView('home')}
       />

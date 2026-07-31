@@ -6,11 +6,18 @@ import type { Question } from '../quiz/types'
 
 interface Props {
   questions: readonly Question[]
+  /** Which sequence is being studied, e.g. "Fundamentals (Beginner)". */
+  sequenceName: string
   onAnswer: (questionId: string, correct: boolean) => void
   onExit: () => void
 }
 
-export default function QuizView({ questions, onAnswer, onExit }: Props) {
+export default function QuizView({
+  questions,
+  sequenceName,
+  onAnswer,
+  onExit,
+}: Props) {
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
   const [revealed, setRevealed] = useState(false)
@@ -21,6 +28,7 @@ export default function QuizView({ questions, onAnswer, onExit }: Props) {
   if (!question) {
     return (
       <>
+        <p className="quiz-scope">{sequenceName}</p>
         <h1>Session complete</h1>
         <p className="subtitle">
           {score} of {questions.length} correct.
@@ -69,9 +77,15 @@ export default function QuizView({ questions, onAnswer, onExit }: Props) {
       </div>
 
       <div className="header">
-        <p className="subtitle">
-          {index + 1} of {questions.length}
-        </p>
+        {/* Which sequence, then where you are in it. Several questions only
+            have a right answer relative to the sequence, so seeing it named
+            while you answer matters. */}
+        <div>
+          <p className="quiz-scope">{sequenceName}</p>
+          <p className="subtitle">
+            {index + 1} of {questions.length}
+          </p>
+        </div>
         <button className="btn-ghost chip" onClick={onExit}>
           Exit
         </button>
