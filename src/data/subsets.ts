@@ -119,7 +119,7 @@ const ADVANCED_CLOSING: readonly string[] = [
 const FUNDAMENTALS_GROUP = 'fundamentals'
 
 /**
- * Every level says it is a shape rather than a rule, because that is how the
+ * Every level says it is an example rather than a rule, because that is how the
  * pacing sheet presents them: a 60 minute plan you bend to the class in front
  * of you and the time on the clock.
  */
@@ -129,7 +129,7 @@ export const SUBSETS: readonly Subset[] = [
     name: 'Beginner',
     group: FUNDAMENTALS_GROUP,
     description:
-      'Every round taught: demo, verbal, counting, unguided. Seated stops at Janu Sirsasana A, and the closing goes straight to the seals. A typical shape -- adapt it to the class and the time.',
+      'Seated stops at Janu Sirsasana A, and the closing goes straight to the seals. An example class -- adapt it to the class and the time.',
     poseIds: [
       ...SUN_SALUTATIONS,
       ...STANDING,
@@ -142,7 +142,7 @@ export const SUBSETS: readonly Subset[] = [
     name: 'Intermediate',
     group: FUNDAMENTALS_GROUP,
     description:
-      'Adds Paschimottanasana D, Janu Sirsasana B and C, and the inversions through headstand. A typical shape -- adapt it to the class and the time.',
+      'Adds Paschimottanasana D, Janu Sirsasana B and C, and the inversions through headstand. An example class -- adapt it to the class and the time.',
     poseIds: [
       ...SUN_SALUTATIONS,
       ...STANDING,
@@ -155,7 +155,7 @@ export const SUBSETS: readonly Subset[] = [
     name: 'Advanced',
     group: FUNDAMENTALS_GROUP,
     description:
-      'Adds Marichyasana A and B, and the full finishing sequence. A typical shape -- adapt it to the class and the time.',
+      'Adds Marichyasana A and B, and the full finishing sequence. An example class -- adapt it to the class and the time.',
     poseIds: [
       ...SUN_SALUTATIONS,
       ...STANDING,
