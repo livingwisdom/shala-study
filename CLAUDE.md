@@ -164,8 +164,11 @@ field generates no question; a wrong field silently teaches a wrong answer that
 gets repeated in an exam and eventually to a student.
 
 - Never guess a value to fill a field. Leave it `undefined` and let the
-  generator skip it. Breath counts for shoulderstand and headstand are blank for
-  this reason -- they vary by teacher.
+  generator skip it, until the shala supplies it. The headstand, shoulderstand
+  and closing holds were blank on exactly this rule and are now filled from the
+  shala: 15 and 10 for Baddha Hasta Sirsasana A and B, and 10 for the
+  shoulderstand, the closing Paschimottanasana, Yoga Mudra and Padmasana.
+  Parvatasana A and B are still blank, which is the rule working.
 - Empty answers in `questionBank.ts` are deliberate placeholders, not omissions.
   They are excluded from the quiz and listed in the app's "Needs answers" view.
   **Do not fill them from general knowledge** -- especially the pregnancy,

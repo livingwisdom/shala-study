@@ -554,8 +554,9 @@ const BACKBENDS: readonly PoseSeed[] = [
     english: 'Seated Forward Bend (closing)',
     section: 'backbends',
     hold: 'held',
+    breaths: 10,
     drishti: 'padhayoragrai',
-    notes: 'Counter-pose after backbends. Breath count varies by teacher.',
+    notes: 'Counter-pose after the backbends.',
   },
 ]
 
@@ -566,8 +567,8 @@ const FINISHING: readonly PoseSeed[] = [
     english: 'Shoulderstand',
     section: 'finishing',
     hold: 'held',
+    breaths: 10,
     drishti: 'nasagrai',
-    notes: 'A long hold -- commonly 10 to 25 breaths. Confirm the shala’s count.',
   },
   {
     id: 'halasana',
@@ -667,7 +668,7 @@ const FINISHING: readonly PoseSeed[] = [
     english: 'Sealed Yoga Pose',
     section: 'finishing',
     hold: 'held',
-    breaths: 5,
+    breaths: 10,
     drishti: 'broomadhya',
   },
   {
@@ -696,7 +697,7 @@ const FINISHING: readonly PoseSeed[] = [
     english: 'Lotus Pose',
     section: 'finishing',
     hold: 'held',
-    breaths: 5,
+    breaths: 10,
     drishti: 'nasagrai',
   },
   {

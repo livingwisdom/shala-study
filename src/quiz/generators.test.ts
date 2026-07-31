@@ -333,14 +333,23 @@ describe('uncounted breaths', () => {
 
 describe('missing data', () => {
   it('generates no breath question where breaths are unrecorded', () => {
-    // Shoulderstand holds for a teacher-dependent count, so the data leaves it
-    // blank rather than asserting a number. Parvatasana is the same case: the
-    // shala gave the shapes but not the counts.
-    expect(
-      allQuestions.find((q) => q.id === 'breaths:salamba-sarvangasana'),
-    ).toBeUndefined()
+    // Parvatasana is the remaining case: the shala gave the shapes but not the
+    // counts, so the questions stay absent rather than guessing.
     expect(allQuestions.find((q) => q.id === 'breaths:parvatasana-a')).toBeUndefined()
     expect(allQuestions.find((q) => q.id === 'breaths:parvatasana-b')).toBeUndefined()
+  })
+
+  it('asks the long holds the shala gave', () => {
+    // Ten breaths each, and the seals agree with the script, which said so all
+    // along while the seeded data said five.
+    for (const poseId of [
+      'salamba-sarvangasana',
+      'yoga-mudra',
+      'padmasana',
+      'paschimottanasana-closing',
+    ]) {
+      expect(find(`breaths:${poseId}`).answer, poseId).toBe('10')
+    }
   })
 
   it('asks the headstand holds, which the pacing sheet did record', () => {
