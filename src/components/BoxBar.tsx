@@ -1,7 +1,12 @@
 // src/components/BoxBar.tsx -- JRS 2026-07-30
 // Stacked bar and legend showing how the pool sits across the Leitner boxes.
 
+import { useState } from 'react'
 import { MAX_BOX, boxIntervalLabel, type BoxDistribution } from '../quiz/scheduler'
+import {
+  boxCaptionDismissed,
+  setBoxCaptionDismissed,
+} from '../storage/preferences'
 
 /**
  * An ordinal ramp -- one hue, five steps -- because the boxes are one axis from
@@ -65,6 +70,20 @@ function cells(distribution: BoxDistribution): Cell[] {
 }
 
 export default function BoxBar({ distribution }: { distribution: BoxDistribution }) {
+  // Read once on mount: the explanation is worth reading twice and not twenty
+  // times, so dismissing it sticks across sessions.
+  const [explained, setExplained] = useState(() => !boxCaptionDismissed())
+
+  const dismiss = () => {
+    setBoxCaptionDismissed(true)
+    setExplained(false)
+  }
+
+  const recall = () => {
+    setBoxCaptionDismissed(false)
+    setExplained(true)
+  }
+
   const all = cells(distribution)
   const total = all.reduce((sum, cell) => sum + cell.count, 0)
   if (total === 0) return null
@@ -96,12 +115,35 @@ export default function BoxBar({ distribution }: { distribution: BoxDistribution
         ))}
       </ul>
 
-      <p className="subtitle box-caption">
-        Labels are when a question comes back. New ones start on the right, and
-        each right answer moves a question one box left, further out in time.
-        Miss one and it goes straight back to &ldquo;again&rdquo;, however far
-        left it had reached.
-      </p>
+      {explained ? (
+        <div className="box-explainer">
+          <p className="subtitle box-caption">
+            Each column is a group of questions, labelled with how long until
+            you&rsquo;ll be asked them again. The ones on the right are new, and
+            haven&rsquo;t been asked yet.
+          </p>
+          <p className="subtitle box-caption">
+            Answer a question correctly and it moves one column left, so the
+            wait grows each time: a day, then three days, a week, three weeks.
+            Miss it and it drops straight back to &ldquo;again&rdquo;, however
+            far left it had reached.
+          </p>
+          <button className="btn-ghost chip box-dismiss" onClick={dismiss}>
+            Got it
+          </button>
+        </div>
+      ) : (
+        /* Discreet on purpose: the chart is the point, and this is only here
+           for the day you forget what the labels mean. */
+        <button
+          className="btn-ghost box-explain"
+          onClick={recall}
+          aria-label="What do these labels mean?"
+          title="What do these labels mean?"
+        >
+          ?
+        </button>
+      )}
     </div>
   )
 }

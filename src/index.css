@@ -26,6 +26,9 @@
   /* Text sitting on an accent fill, which is not the page background in light
      mode -- white on the light accent is 6.4:1. */
   --on-accent: #ffffff;
+  /* A panel inside a card. Near neutral on purpose: the warm surfaces read as
+     brown once they're stacked two deep. */
+  --panel: #f3f3f2;
   --correct: #559c1c;
   --incorrect: #c62f4b;
   --warn: #a8860b;
@@ -77,6 +80,7 @@
     --accent-hover: #6cc7be;
     --accent-dim: #2a4f4b;
     --on-accent: #1c1917;
+    --panel: #312f2e;
     --correct: #86dd7f;
     --incorrect: #e3746a;
     --warn: #dfb14e;
@@ -364,9 +368,41 @@ button:focus-visible {
   font-size: var(--text-2xs);
 }
 
+/* The explanation and its dismiss button read as one panel, so the button
+   plainly belongs to the text above it rather than to the chart. */
+.box-explainer {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
 .box-caption {
-  margin: var(--space-3) 0 0;
+  margin: 0;
   font-size: var(--text-xs);
+}
+
+.box-caption + .box-caption {
+  margin-top: var(--space-2);
+}
+
+/* Bottom right, where the ? that replaces it will sit. */
+.box-dismiss {
+  display: block;
+  margin: var(--space-2) 0 0 auto;
+}
+
+/* Sits to the right, small and quiet: it's a way back to the explanation, not
+   an invitation to read it again. */
+.box-explain {
+  display: block;
+  margin: var(--space-3) 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  color: var(--text-dim);
 }
 
 /* Quiz */
