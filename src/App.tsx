@@ -62,7 +62,16 @@ export default function App() {
     })
   }, [pool, session])
 
-  const startSession = useCallback(
+  /*
+   * Two named entry points rather than one optional parameter.
+   *
+   * `startSession` was wired straight to onClick, so React handed it the mouse
+   * event as its pose id: truthy, so it took the focus path, filtered the pool
+   * against an event object, found nothing, and returned silently. The button
+   * did nothing at all. A required parameter can't be passed by accident, and
+   * the type checker rejects wiring this one to a bare onClick.
+   */
+  const begin = useCallback(
     (poseId?: string) => {
       // Seeded from the start time so each session shuffles differently, while
       // the picked ids are frozen in state -- a re-render can't reorder a
@@ -86,6 +95,12 @@ export default function App() {
       setView('quiz')
     },
     [pool, progress, subsetId, topics],
+  )
+
+  const startSession = useCallback(() => begin(), [begin])
+  const startFocusSession = useCallback(
+    (poseId: string) => begin(poseId),
+    [begin],
   )
 
   const recordAnswer = useCallback((questionId: string, correct: boolean) => {
@@ -123,7 +138,7 @@ export default function App() {
       <SequenceBrowser
         subsetId={subsetId}
         onSubsetChange={setSubsetId}
-        onFocusPose={(poseId) => startSession(poseId)}
+        onFocusPose={startFocusSession}
         onExit={() => setView('home')}
       />
     )
