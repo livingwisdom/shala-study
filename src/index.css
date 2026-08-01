@@ -70,17 +70,22 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1c1917;
-    --surface: #292524;
-    --surface-raised: #35302c;
-    --border: #44403c;
-    --text: #f5f5f4;
-    --text-dim: #a8a29e;
+    --bg: #191614;
+    --surface: #2b2724;
+    --surface-raised: #3a3532;
+    --border: #514b45;
+    /* Softer than white: at 16:1 on this background the strokes bloom, which
+       is the dark-mode version of glare. */
+    --text: #eae7e3;
+    /* Much lighter than the light theme's grey. Secondary text here is 0.8rem
+       and 0.64rem, and a mid grey that measures 6:1 still reads badly that
+       small on near black. Hierarchy comes from size and weight instead. */
+    --text-dim: #c4beb8;
     --accent: #4fb5ab;
     --accent-hover: #6cc7be;
     --accent-dim: #2a4f4b;
-    --on-accent: #1c1917;
-    --panel: #312f2e;
+    --on-accent: #191614;
+    --panel: #333029;
     --correct: #86dd7f;
     --incorrect: #e3746a;
     --warn: #dfb14e;
@@ -110,6 +115,15 @@ body {
   font-family: var(--font-sans);
   line-height: var(--leading-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Greyscale smoothing thins glyphs. On light text over a dark background that
+   works against you: the strokes are already fighting halation, and thinning
+   them is most of why dark mode felt harder to read. */
+@media (prefers-color-scheme: dark) {
+  body {
+    -webkit-font-smoothing: auto;
+  }
 }
 
 /* viewport-fit=cover deliberately puts the page under the notch and the home
