@@ -107,6 +107,18 @@ export default function QuizView({
                 onClick={() => submitChoice(choice)}
                 disabled={answered}
               >
+                {/* A mark as well as a colour: which row is which shouldn't
+                    depend on telling red from green. */}
+                {answered && choice === question.answer && (
+                  <span className="choice-mark" aria-hidden="true">
+                    ✓
+                  </span>
+                )}
+                {answered && choice === selected && choice !== question.answer && (
+                  <span className="choice-mark" aria-hidden="true">
+                    ✗
+                  </span>
+                )}
                 {choice}
               </button>
             ))}
@@ -120,7 +132,16 @@ export default function QuizView({
                 >
                   {selected === question.answer ? 'Correct' : 'Not quite'}
                 </div>
-                {question.explanation ?? question.answer}
+                {/* Only ever say something the choices above don't already
+                    say. Printing the bare answer here repeated the row that is
+                    already marked correct, unlabelled, which read as a third
+                    and contradictory verdict. */}
+                {selected !== question.answer && (
+                  <div className="feedback-answer">
+                    The answer is <strong>{question.answer}</strong>.
+                  </div>
+                )}
+                {question.explanation}
               </div>
               <button
                 className="btn-primary"

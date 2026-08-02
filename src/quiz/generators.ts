@@ -821,7 +821,7 @@ function scriptQuestions(
           question(
             `script-cue-count:${stepKey}`,
             'cues',
-            `${block.title} -- on which count do you say "${step.cue}"?`,
+            `During ${block.title}, on which count do you say "${step.cue}"?`,
             countWord(count),
             counted
               .map((other) => other.count)
@@ -838,9 +838,11 @@ function scriptQuestions(
             `script-cue:${stepKey}`,
             'cues',
             `${block.title} -- what do you say on ${word} (${count})?`,
-            step.cue,
+            // Breath first, because that's the order you say it in: "inhale,
+            // hands up". Leaving it to the note underneath taught the words
+            // detached from the breath that carries them.
+            `${step.breath} -- ${step.cue}`,
             [
-              step.breath,
               step.gaze ? `gaze ${step.gaze}` : null,
               step.hold ? `held ${step.hold.breaths} breaths` : null,
             ]

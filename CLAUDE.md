@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Inherited conventions
 
 `/Users/tao/CLAUDE.md` sits directly above this project and is loaded as a
@@ -17,12 +15,10 @@ because a convention nothing checks drifts back within a few edits:
 - **Every source file opens with `// <path> -- JRS <date>` and a one-line
   summary.** New files need this or the suite fails.
 
-Its C-specific rules (brace-always, single exit, parameter objects, define
-before use) are marked `(C code)` there and are not applied to this TypeScript.
-`question()` in `src/quiz/generators.ts` does take six positional parameters,
-four of them strings, which is the hazard the parameter-object rule guards
-against -- left as-is deliberately, but it is the one place worth revisiting if
-it ever grows a seventh.
+`question()` in `src/quiz/generators.ts` takes six positional parameters, four
+of them strings -- the hazard the parent file's parameter-object rule guards
+against. Left as-is deliberately, but it is the one place worth revisiting if it
+ever grows a seventh.
 
 ## What this is
 
@@ -33,15 +29,9 @@ URL and used offline in the studio, on iOS and Android alike.
 
 ## Commands
 
-```bash
-npm run dev          # dev server at localhost:5173
-npm run build        # typecheck (tsc -b) then production build to dist/
-npm run preview      # serve the built output, incl. the service worker
-npm test             # vitest, single run
-npm run test:watch   # vitest in watch mode
-npm run typecheck    # types only, no build
-npm run lint         # eslint
+Everyday scripts are in `package.json`. Two that aren't:
 
+```bash
 npx vitest run src/quiz/generators.test.ts              # one file
 npx vitest run -t 'knows which count is held'           # one test by name
 ```

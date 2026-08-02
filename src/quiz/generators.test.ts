@@ -211,6 +211,11 @@ describe('cues read backwards', () => {
         q.prompt.includes('hop or step back'),
     )
     expect(question?.answer).toBe('catvari (4)')
+    // Reads as a sentence rather than "Pose -- question": the block name is
+    // context, so it belongs in the sentence, not in front of it.
+    expect(question?.prompt.startsWith('During Surya Namaskara A, on which')).toBe(
+      true,
+    )
   })
 
   it('skips cues the block says more than once', () => {

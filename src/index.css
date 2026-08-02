@@ -497,6 +497,23 @@ button:focus-visible {
   line-height: var(--leading-body);
 }
 
+.choice-mark {
+  margin-right: var(--space-2);
+  font-weight: 600;
+}
+
+.choice.correct .choice-mark {
+  color: var(--correct);
+}
+
+.choice.incorrect .choice-mark {
+  color: var(--incorrect);
+}
+
+.feedback-answer {
+  margin-bottom: var(--space-1);
+}
+
 .feedback .verdict {
   font-weight: 600;
   margin-bottom: var(--space-1);
