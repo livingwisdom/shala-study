@@ -129,7 +129,7 @@ export const SUBSETS: readonly Subset[] = [
     name: 'Beginner',
     group: FUNDAMENTALS_GROUP,
     description:
-      'Seated stops at Janu Sirsasana A, and the closing goes straight to the seals. An example class -- adapt it to the room and the time.',
+      'Seated stops at Janu Sirsasana A. The closing keeps the backbends and the forward fold, then goes straight to the seals without the inversions. An example class -- adapt it to the room and the time.',
     poseIds: [
       ...SUN_SALUTATIONS,
       ...STANDING,
