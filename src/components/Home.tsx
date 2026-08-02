@@ -108,7 +108,7 @@ export default function Home({
         {stats.due === 0 ? 'Nothing due -- come back later' : `Study ${Math.min(stats.due, 20)} questions`}
       </button>
 
-      <div className="row" style={{ marginTop: '1rem' }}>
+      <div className="actions">
         <button className="btn-ghost" onClick={onShowScript}>
           Teaching script
         </button>
@@ -143,7 +143,7 @@ export default function Home({
       {/* Housekeeping, after the studying: what the app still needs from the
           shala, and the button that throws your review history away. Reset
           stays out of the navigation row, where it looked harmless. */}
-      <div className="row">
+      <div className="actions">
         <button className="btn-ghost" onClick={onShowGaps}>
           Needs answers{gapCount > 0 && ` (${gapCount})`}
         </button>

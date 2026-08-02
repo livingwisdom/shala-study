@@ -264,6 +264,18 @@ button:focus-visible {
   gap: var(--space-2);
 }
 
+/* Paired buttons split the width rather than sizing to their labels, which
+   left a ragged gap on the right and wrapped unevenly on narrow screens. */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.btn-primary + .actions {
+  margin-top: var(--space-4);
+}
+
 .label,
 .stat-label,
 .box-label {
