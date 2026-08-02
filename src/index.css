@@ -315,6 +315,12 @@ button:focus-visible {
   border-color: var(--accent);
 }
 
+/* Set apart from the actions above it: this is the part you scroll to, not
+   the part you came for. */
+.progress-card {
+  margin-top: var(--space-6);
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

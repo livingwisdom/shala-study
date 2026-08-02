@@ -117,14 +117,11 @@ export default function Home({
         <button className="btn-ghost" onClick={onShowGaps}>
           Needs answers{gapCount > 0 && ` (${gapCount})`}
         </button>
-        <button className="btn-ghost" onClick={onReset}>
-          Reset progress
-        </button>
       </div>
 
       {/* Below the button on purpose. What you can do fits above the fold, and
           measuring how you're doing waits until you've scrolled for it. */}
-      <div className="card">
+      <div className="card progress-card">
         <div className="label">Progress</div>
         <div className="stats">
           <div>
@@ -144,6 +141,12 @@ export default function Home({
         </div>
         <BoxBar distribution={distribution} />
       </div>
+
+      {/* Last, and on its own: it throws away every review record, so it
+          shouldn't sit in a row of harmless navigation. */}
+      <button className="btn-ghost" onClick={onReset}>
+        Reset progress
+      </button>
     </>
   )
 }
