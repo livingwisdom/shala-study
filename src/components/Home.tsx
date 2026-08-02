@@ -115,9 +115,6 @@ export default function Home({
         <button className="btn-ghost" onClick={onBrowse}>
           Browse sequence
         </button>
-        <button className="btn-ghost" onClick={onShowGaps}>
-          Needs answers{gapCount > 0 && ` (${gapCount})`}
-        </button>
       </div>
 
       {/* Below the button on purpose. What you can do fits above the fold, and
@@ -143,11 +140,17 @@ export default function Home({
         <BoxBar distribution={distribution} />
       </div>
 
-      {/* Last, and on its own: it throws away every review record, so it
-          shouldn't sit in a row of harmless navigation. */}
-      <button className="btn-ghost" onClick={onReset}>
-        Reset progress
-      </button>
+      {/* Housekeeping, after the studying: what the app still needs from the
+          shala, and the button that throws your review history away. Reset
+          stays out of the navigation row, where it looked harmless. */}
+      <div className="row">
+        <button className="btn-ghost" onClick={onShowGaps}>
+          Needs answers{gapCount > 0 && ` (${gapCount})`}
+        </button>
+        <button className="btn-ghost" onClick={onReset}>
+          Reset progress
+        </button>
+      </div>
     </>
   )
 }
