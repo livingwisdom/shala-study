@@ -537,8 +537,12 @@ const FINISHING: readonly PoseSeed[] = [
   },
   {
     id: 'paschimottanasana-closing',
-    sanskrit: 'Paschimottanasana',
-    english: 'Seated Forward Bend (closing)',
+    // Qualified because the seated ones are Paschimottanasana A, B, C and D,
+    // so a bare "Paschimottanasana" reads as the family rather than this one.
+    // The shala says just Paschimottanasana; the word "closing" is the app's,
+    // to make a question about it answerable.
+    sanskrit: 'Closing Paschimottanasana',
+    english: 'Closing Seated Forward Bend',
     section: 'finishing',
     hold: 'held',
     breaths: 10,

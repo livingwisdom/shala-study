@@ -349,6 +349,10 @@ function poseSectionQuestions(poses: readonly Pose[]): Question[] {
   return poses.flatMap((pose) => {
     const section = getSection(pose.section)
     if (!section) return []
+    // A pose whose name carries its section answers the question for you:
+    // "which section does Closing Paschimottanasana belong to?" is not a
+    // question. The name earns its qualifier elsewhere; here it disqualifies.
+    if (pose.sanskrit.toLowerCase().includes(section.name.toLowerCase())) return []
     return about([pose.id], [
       question(
         `section-of:${pose.id}`,

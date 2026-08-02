@@ -913,7 +913,9 @@ const TRANSCRIBED_SCRIPT: readonly PoseScript[] = [
 
   {
     id: 'paschimottanasana-closing',
-    title: 'paschimottanasana',
+    // The document writes this block "paschimottanasana"; the qualifier is the
+    // app's, so cue questions say which Paschimottanasana they mean.
+    title: 'closing paschimottanasana',
     poseIds: ['paschimottanasana-closing'],
     steps: [
       s(7, 'inhale', 'jump through to seated, legs long in front'),
