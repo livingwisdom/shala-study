@@ -1,9 +1,8 @@
 // src/components/NeedsAnswers.tsx -- JRS 2026-07-29
 // Open gaps: unanswered prompts, unknown gaze, source contradictions.
 
-import { unansweredEntries } from '../data/questionBank'
-import { scriptedPosesWithUnknownGaze } from '../data/gaze'
-import { SOURCE_SPELLINGS, corrections, sourceIssues } from '../data/script'
+import { openGapCount, openGaps } from '../data/gaps'
+import { SOURCE_SPELLINGS } from '../data/script'
 import { getPose } from '../data/sequence'
 import { TOPIC_LABELS, type Topic } from '../quiz/types'
 
@@ -20,19 +19,19 @@ interface Props {
  * all three are invisible unless something surfaces them.
  */
 export default function NeedsAnswers({ onExit }: Props) {
-  const entries = unansweredEntries()
-  const gazeGaps = scriptedPosesWithUnknownGaze()
-  const issues = sourceIssues()
-  const fixed = corrections()
+  const {
+    unanswered: entries,
+    unknownGaze: gazeGaps,
+    issues,
+    corrections: fixed,
+  } = openGaps()
 
   const byTopic = new Map<Topic, typeof entries>()
   for (const entry of entries) {
     byTopic.set(entry.topic, [...(byTopic.get(entry.topic) ?? []), entry])
   }
 
-  // Corrections aren't "open" -- they're already applied here -- so they're
-  // listed but not counted as outstanding work.
-  const total = entries.length + gazeGaps.length + issues.length
+  const total = openGapCount()
 
   return (
     <>

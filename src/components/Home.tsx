@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react'
 import { getSubset } from '../data/subsets'
-import { unansweredEntries } from '../data/questionBank'
+import { openGapCount } from '../data/gaps'
 import { topicsInPool } from '../quiz/engine'
 import { boxDistribution, summarise, type Progress } from '../quiz/scheduler'
 import BoxBar from './BoxBar'
@@ -47,7 +47,8 @@ export default function Home({
   // Topics are computed from the *unfiltered* pool so the filter chips don't
   // vanish as you narrow the selection and strand you with no way back.
   const availableTopics = useMemo(() => topicsInPool(pool), [pool])
-  const gapCount = unansweredEntries().length
+  // The same count the Needs answers view shows, not a narrower one.
+  const gapCount = openGapCount()
 
   const toggleTopic = (topic: Topic) => {
     onTopicsChange(
