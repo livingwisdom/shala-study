@@ -21,7 +21,6 @@ export type SectionId =
   | 'surya-namaskara'
   | 'standing'
   | 'seated'
-  | 'backbends'
   | 'finishing'
 
 export interface Section {

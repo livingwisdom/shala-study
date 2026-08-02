@@ -315,10 +315,10 @@ button:focus-visible {
   border-color: var(--accent);
 }
 
-/* Set apart from the actions above it: this is the part you scroll to, not
-   the part you came for. */
+/* The nav row above it has no bottom margin of its own, so this restores the
+   same gap every other card sits in. */
 .progress-card {
-  margin-top: var(--space-6);
+  margin-top: var(--space-4);
 }
 
 .stats {
