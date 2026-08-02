@@ -88,27 +88,6 @@ export default function Home({
       )}
 
       <div className="card">
-        <div className="label">Progress</div>
-        <div className="stats">
-          <div>
-            {/* Reviews only. The count of new questions is right below in the
-                box row, and showing it twice read as a mistake. */}
-            <div className="stat-value">{stats.reviewDue}</div>
-            <div className="stat-label">Review</div>
-          </div>
-          <div>
-            <div className="stat-value">{stats.seen}</div>
-            <div className="stat-label">Seen</div>
-          </div>
-          <div>
-            <div className="stat-value">{stats.total}</div>
-            <div className="stat-label">Total</div>
-          </div>
-        </div>
-        <BoxBar distribution={distribution} />
-      </div>
-
-      <div className="card">
         <div className="label">Topics {topics.length === 0 && '(all)'}</div>
         <div className="row">
           {availableTopics.map((topic) => (
@@ -141,6 +120,29 @@ export default function Home({
         <button className="btn-ghost" onClick={onReset}>
           Reset progress
         </button>
+      </div>
+
+      {/* Below the button on purpose. What you can do fits above the fold, and
+          measuring how you're doing waits until you've scrolled for it. */}
+      <div className="card">
+        <div className="label">Progress</div>
+        <div className="stats">
+          <div>
+            {/* Reviews only. The count of new questions is right below in the
+                box row, and showing it twice read as a mistake. */}
+            <div className="stat-value">{stats.reviewDue}</div>
+            <div className="stat-label">Review</div>
+          </div>
+          <div>
+            <div className="stat-value">{stats.seen}</div>
+            <div className="stat-label">Seen</div>
+          </div>
+          <div>
+            <div className="stat-value">{stats.total}</div>
+            <div className="stat-label">Total</div>
+          </div>
+        </div>
+        <BoxBar distribution={distribution} />
       </div>
     </>
   )
